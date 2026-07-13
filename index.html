@@ -1569,17 +1569,6 @@ function TypeBadge({ type }) {
   );
 }
 
-function VisitedStamp({ date }) {
-  return (
-    <div className="stamp">
-      <div className="stamp-ring">
-        <span>VISITED</span>
-        <span className="stamp-date">{date}</span>
-      </div>
-    </div>
-  );
-}
-
 // ---------------------------------------------------------------------------
 // Add Park Form
 // ---------------------------------------------------------------------------
@@ -1727,7 +1716,7 @@ function AddParkForm({ onAdd, onCancel }) {
 // Park Card
 // ---------------------------------------------------------------------------
 
-function ParkCard({ park, visit, distance, onToggleVisited, onToggleFavorite, onNotesChange, onDelete }) {
+function ParkCard({ park, visit, distance, onToggleVisited, onToggleFavorite, onNotesChange, onDelete, onOpenMap }) {
   const [expanded, setExpanded] = useState(false);
   const [localNotes, setLocalNotes] = useState(visit.notes || "");
 
@@ -1735,15 +1724,26 @@ function ParkCard({ park, visit, distance, onToggleVisited, onToggleFavorite, on
     setLocalNotes(visit.notes || "");
   }, [visit.notes]);
 
+  const handleCardClick = () => {
+    if (onOpenMap) onOpenMap(park.id);
+  };
+
+  const stop = (fn) => (e) => {
+    e.stopPropagation();
+    fn(e);
+  };
+
   return (
-    <div className={`park-card ${visit.visited ? "park-card-visited" : ""}`}>
-      {visit.visited && <VisitedStamp date={visit.dateVisited} />}
+    <div
+      className={`park-card ${visit.visited ? "park-card-visited" : ""} ${onOpenMap ? "park-card-clickable" : ""}`}
+      onClick={onOpenMap ? handleCardClick : undefined}
+    >
 
       <div className="park-card-top">
         <TypeBadge type={park.type} />
         <button
           className={`heart-btn ${visit.favorite ? "heart-active" : ""}`}
-          onClick={onToggleFavorite}
+          onClick={stop(onToggleFavorite)}
           aria-label="Favorite"
         >
           <Heart size={17} fill={visit.favorite ? "#C1541C" : "none"} />
@@ -1772,6 +1772,7 @@ function ParkCard({ park, visit, distance, onToggleVisited, onToggleFavorite, on
           href={getParkWebsite(park)}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
         >
           <ExternalLink size={12} /> Official website
         </a>
@@ -1797,21 +1798,21 @@ function ParkCard({ park, visit, distance, onToggleVisited, onToggleFavorite, on
       <div className="card-actions">
         <button
           className={`visit-btn ${visit.visited ? "visit-btn-active" : ""}`}
-          onClick={onToggleVisited}
+          onClick={stop(onToggleVisited)}
         >
           {visit.visited ? <Check size={15} /> : <Compass size={15} />}
           {visit.visited ? "Visited" : "Mark Visited"}
         </button>
-        <button className="text-btn" onClick={() => setExpanded((e) => !e)}>
+        <button className="text-btn" onClick={stop(() => setExpanded((e) => !e))}>
           Notes {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </button>
-        <button className="icon-btn danger" onClick={onDelete} aria-label="Remove">
+        <button className="icon-btn danger" onClick={stop(onDelete)} aria-label="Remove">
           <Trash2 size={15} />
         </button>
       </div>
 
       {expanded && (
-        <div className="notes-panel">
+        <div className="notes-panel" onClick={(e) => e.stopPropagation()}>
           {park.infoNote && <p className="info-note">{park.infoNote}</p>}
           <textarea
             className="field-input"
@@ -1954,7 +1955,12 @@ function ParkMap({
     }
 
     if (bounds.length > 0 && !hasFitBoundsRef.current) {
-      mapRef.current.fitBounds(bounds, { padding: [30, 30], maxZoom: 13 });
+      const preselected = withCoords.find((p) => p.id === selectedParkId);
+      if (preselected) {
+        mapRef.current.setView([preselected._coords.lat, preselected._coords.lng], 15);
+      } else {
+        mapRef.current.fitBounds(bounds, { padding: [30, 30], maxZoom: 13 });
+      }
       hasFitBoundsRef.current = true;
     }
   }, [withCoords, userCoords, selectedParkId, onSelectPark, leafletReady]);
@@ -2152,6 +2158,11 @@ export default function ParkExplorer() {
     setActivityFilter((prev) =>
       prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]
     );
+  };
+
+  const openParkOnMap = (parkId) => {
+    setSelectedParkId(parkId);
+    setActiveView("map");
   };
 
   const activeFilterCount =
@@ -2381,6 +2392,7 @@ export default function ParkExplorer() {
               onToggleFavorite={() => toggleFavorite(park.id)}
               onNotesChange={(notes) => setNotes(park.id, notes)}
               onDelete={() => deletePark(park.id)}
+              onOpenMap={openParkOnMap}
             />
           ))}
         </main>
@@ -2588,24 +2600,14 @@ function StyleBlock() {
         border-radius: 12px;
         padding: 16px;
         overflow: hidden;
+        transition: box-shadow 0.15s, border-color 0.15s;
       }
       .park-card-visited { border-color: var(--canopy-light); }
-
-      .stamp {
-        position: absolute; top: 10px; right: 10px; z-index: 2;
-        transform: rotate(-9deg);
+      .park-card-clickable { cursor: pointer; }
+      .park-card-clickable:hover {
+        box-shadow: 0 3px 10px rgba(31, 61, 43, 0.12);
+        border-color: var(--canopy-light);
       }
-      .stamp-ring {
-        border: 2px dashed var(--blaze);
-        border-radius: 8px;
-        padding: 3px 8px;
-        display: flex; flex-direction: column; align-items: center;
-        color: var(--blaze);
-        font-family: 'JetBrains Mono', monospace;
-        opacity: 0.85;
-      }
-      .stamp-ring span { font-size: 9.5px; font-weight: 700; letter-spacing: 0.8px; }
-      .stamp-date { font-size: 8.5px !important; font-weight: 500 !important; }
 
       .park-card-top {
         display: flex; align-items: center; justify-content: space-between;
@@ -2624,7 +2626,7 @@ function StyleBlock() {
 
       .park-name {
         font-family: 'Zilla Slab', serif; font-size: 18px; font-weight: 700;
-        margin: 2px 0 8px; color: var(--canopy); padding-right: 60px;
+        margin: 2px 0 8px; color: var(--canopy);
       }
 
       .park-meta-row {
