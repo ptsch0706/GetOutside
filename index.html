@@ -1,0 +1,2777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<title>Get Outside — Park Explorer</title>
+<meta name="description" content="Personal park finder and visit tracker for the Tampa Bay area." />
+<meta name="theme-color" content="#1F3D2B" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon.svg" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Get Outside" />
+
+<!-- Import map: lets the browser resolve bare "react" / "lucide-react" imports -->
+<!-- straight from a CDN, with no build step or bundler required. -->
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@18.3.1",
+    "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+    "lucide-react": "https://esm.sh/lucide-react@0.383.0?external=react",
+    "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime"
+  }
+}
+</script>
+
+<!-- Babel Standalone: transpiles the JSX below, right in the browser. -->
+<script src="https://unpkg.com/@babel/standalone@7.24.7/babel.min.js"></script>
+
+<style>
+  html, body { margin: 0; padding: 0; background: #F2EEE1; }
+  #root { min-height: 100vh; }
+  #boot-loading {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100vh; gap: 10px; color: #4B7A3E; font-family: -apple-system, sans-serif;
+  }
+</style>
+</head>
+<body>
+<div id="root">
+  <div id="boot-loading">Loading Get Outside…</div>
+</div>
+
+<script type="text/babel" data-type="module" data-presets="react">
+import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import {
+  TreePine,
+  Dog,
+  Waves,
+  MapPin,
+  Star,
+  Heart,
+  Plus,
+  X,
+  Search,
+  Trash2,
+  Compass,
+  Clock,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  RefreshCw,
+  Map as MapIcon,
+  Navigation,
+  List,
+  ExternalLink,
+  SlidersHorizontal,
+} from "lucide-react";
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const TYPE_META = {
+  city: { label: "Neighborhood / City", icon: TreePine, color: "#2F6F62" },
+  state: { label: "State Park", icon: Compass, color: "#1F3D2B" },
+  nature: { label: "Nature Preserve", icon: TreePine, color: "#4B7A3E" },
+  dog: { label: "Dog Park", icon: Dog, color: "#C1541C" },
+};
+
+const ACTIVITY_OPTIONS = [
+  "Playground",
+  "Hiking Trails",
+  "Dog-Friendly",
+  "Water / Beach",
+  "Fishing",
+  "Kayaking / Boating",
+  "Biking",
+  "Picnic Area",
+  "Splash Pad",
+  "Sports Courts",
+  "Camping",
+];
+
+const STORAGE_KEY = "park-explorer-data-v1";
+
+// Lat/lng lookup for seeded parks, keyed by id. Custom (user-added) parks
+// instead carry their own optional `latitude`/`longitude` fields directly.
+const PARK_COORDS = {
+  "seed-1": [27.8889874, -82.4812381],
+  "seed-2": [27.9538804, -82.4664893],
+  "seed-3": [27.9554118, -82.4553702],
+  "seed-4": [27.9785555, -82.445196],
+  "seed-5": [28.1110414, -82.3679491],
+  "seed-6": [28.1426507, -82.227154],
+  "seed-7": [28.1662334, -82.8441165],
+  "seed-8": [28.0246213, -82.8195608],
+  "seed-9": [27.7801092, -82.1440155],
+  "seed-10": [29.1026902, -82.4377201],
+  "seed-11": [28.0640795, -82.830401],
+  "seed-12": [27.9888576, -82.5041667],
+  "seed-13": [27.955012, -82.4655163],
+  "seed-14": [27.9586281, -82.4627412],
+  "seed-15": [27.9539945, -82.4478953],
+  "seed-16": [28.0971584, -82.3132185],
+  "seed-17": [28.1301451, -82.2753705],
+  "seed-18": [28.0065219, -82.3438968],
+  "seed-19": [27.9489169, -82.4616494],
+  "seed-20": [27.941553, -82.4522125],
+  "seed-21": [27.9505768, -82.5439009],
+  "seed-22": [27.9446677, -82.4587775],
+  "seed-23": [27.9898647, -82.4662277],
+  "seed-24": [27.994698, -82.4481130],
+  "seed-25": [27.9991642, -82.465412],
+  "seed-26": [28.0054872, -82.4670495],
+  "seed-27": [28.0260655, -82.4317426],
+  "seed-28": [27.959139, -82.462825],
+  "seed-29": [27.9194824, -82.5138595],
+  "seed-30": [27.9339327, -82.4772354],
+  "seed-31": [28.071689, -82.4369393],
+  "seed-32": [27.9887687, -82.504127],
+  "seed-33": [27.896053, -82.5122033],
+  "seed-34": [27.85158, -82.5533737],
+  "seed-35": [27.8379308, -82.6674635],
+  "seed-36": [27.7325311, -82.6572831],
+  "seed-37": [27.7791003, -82.6257240],
+  "seed-38": [27.7759766, -82.6312918],
+  "seed-39": [27.7801556, -82.6265611],
+  "seed-40": [27.7426876, -82.6629994],
+  "seed-41": [27.7702398, -82.6285591],
+  "seed-42": [27.8065697, -82.7547124],
+  "seed-43": [27.8475889, -82.6086630],
+  "seed-44": [27.7855347, -82.6420524],
+  "seed-45": [27.7797426, -82.6264485],
+  "seed-46": [27.9656029, -82.8023259],
+  "seed-47": [27.9628118, -82.7731404],
+  "seed-48": [27.975749, -82.723432],
+  "seed-49": [27.9770972, -82.8282905],
+  "seed-50": [27.9591133, -82.8277083],
+  "seed-51": [28.0103711, -82.7269449],
+  "seed-52": [27.9616654, -82.7734521],
+  "seed-53": [27.9165842, -82.7390402],
+  "seed-54": [27.9332494, -82.7656745],
+  "seed-55": [27.9120555, -82.773817],
+  "seed-56": [27.8686245, -82.8136539],
+  "seed-57": [27.841238, -82.774745],
+  "seed-58": [27.8398036, -82.8106857],
+  "seed-59": [28.0199047, -82.7891864],
+  "seed-60": [28.0115326, -82.7918521],
+  "seed-61": [28.0327741, -82.7812694],
+  "seed-62": [28.0373944, -82.7758441],
+  "seed-63": [28.0262637, -82.7563428],
+  "seed-64": [28.10685, -82.7714252],
+  "seed-65": [28.1318021, -82.6566351],
+  "seed-66": [27.9284411, -82.2871612],
+  "seed-67": [27.8942652, -82.2931589],
+  "seed-68": [27.91726, -82.276432],
+  "seed-69": [27.8609438, -82.3358175],
+  "seed-70": [27.8674341, -82.338237],
+  "seed-71": [28.0212119, -82.3878026],
+  "seed-72": [28.0365821, -82.3688988],
+  "seed-73": [28.0143401, -82.3800333],
+  "seed-74": [27.864744, -82.2276463],
+  "seed-75": [27.7390617, -82.4661448],
+  "seed-76": [28.1994572, -82.7795147],
+  "seed-77": [28.37807, -82.5343204],
+  "seed-78": [28.2522927, -82.6492272],
+  "seed-79": [28.2372674, -82.7015524],
+  "seed-80": [28.2606507, -82.635914],
+  "seed-81": [28.2513843, -82.7217561],
+  "seed-82": [28.268833, -82.3229759],
+  "seed-83": [28.194145, -82.3582069],
+  "seed-84": [28.258792, -82.7204396],
+  "seed-85": [28.2537806, -82.7570944],
+  "seed-86": [28.2752856, -82.7251028],
+  "seed-87": [28.0464708, -81.9666371],
+  "seed-88": [28.0422812, -81.949931],
+  "seed-89": [28.0122255, -81.9452137],
+  "seed-90": [27.9898877, -81.8570625],
+  "seed-91": [28.0794457, -81.9461789],
+  "seed-92": [28.0283227, -81.731054],
+  "seed-93": [28.0143214, -81.7474836],
+  "seed-94": [28.0249925, -81.7178106],
+  "seed-95": [28.025317, -81.7237256],
+  "seed-96": [27.3310489, -82.5449753],
+  "seed-97": [27.3416398, -82.548793],
+  "seed-98": [27.3339318, -82.5278391],
+  "seed-99": [27.29693, -82.467642],
+  "seed-100": [27.377295, -82.564196],
+  "seed-101": [27.2774084, -82.4978785],
+  "seed-102": [27.2658919, -82.5499103],
+  "seed-103": [27.3022216, -82.5473296],
+  "seed-104": [27.1807275, -82.4602344],
+  "seed-105": [27.0711111, -82.4480556],
+  "seed-106": [27.3187719, -82.5164952],
+  "seed-107": [27.3494254, -82.4802503],
+  "seed-108": [27.3447599, -82.534095],
+  "seed-109": [27.50067, -82.484104],
+  "seed-110": [27.5138241, -82.6617514],
+  "seed-111": [27.4867221, -82.6422298],
+  "seed-112": [27.5084247, -82.6647426],
+  "seed-113": [27.4992111, -82.5697944],
+  "seed-114": [27.4965558, -82.6775601],
+  "seed-115": [27.4750973, -82.6131089],
+  "seed-116": [27.4607151, -82.4703311],
+  "seed-117": [27.5328758, -82.6258339],
+  "seed-118": [27.513373, -82.364587],
+  "seed-119": [27.495677, -82.685262],
+};
+
+// Official website lookup for seeded parks, keyed by id. Many parks share the
+// same municipal/county parks department page since individual park sub-pages
+// aren't consistently available across every jurisdiction. Custom (user-added)
+// parks instead carry their own optional `website` field directly.
+const TAMPA = "https://www.tampa.gov/parks-and-recreation/parks-and-facilities";
+const HC_GENERAL = "https://hcfl.gov/departments/parks";
+const HC_CONSERVATION = "https://hcfl.gov/residents/parks-and-leisure/conservation-lands/conservation-parks";
+const TEMPLE_TERRACE = "https://www.templeterrace.gov/162/Parks-Recreation";
+const STPETE = "https://www.stpeteparksrec.org/";
+const PINELLAS = "https://pinellas.gov/department/parks-and-preserves/";
+const CLEARWATER = "https://www.myclearwaterparks.com/Home";
+const LARGO = "https://www.playlargo.com/parks/";
+const DUNEDIN = "https://www.dunedin.gov/Community/Parks-Recreation/Parks-Playgrounds";
+const PASCO = "https://www.pascocountyfl.gov/services/parks_recreation_and_natural_resources/index.php";
+const NPR_CITY = "https://www.cityofnewportrichey.org/Parks";
+const LAKELAND = "https://www.lakelandgov.net/departments/parks-recreation-and-cultural-arts/parks/";
+const POLK = "https://www.polkfl.gov/things-to-do/parks-and-recreation/environmental-reserves/";
+const WINTERHAVEN = "https://www.mywinterhaven.com/266/Facilities-Parks";
+const SARASOTA_COUNTY = "https://www.sarasotacountyparks.com/";
+const SARASOTA_CITY = "https://www.letsplaysarasota.com/parks";
+const VENICE = "https://www.venicegov.com/living/parks-and-rec-116";
+const MANATEE = "https://www.mymanatee.org/departments/sports-and-leisure-services-department";
+const fsp = (slug) => `https://www.floridastateparks.org/parks-and-trails/${slug}`;
+
+const PARK_WEBSITES = {
+  "seed-1": TAMPA, "seed-2": TAMPA, "seed-3": TAMPA, "seed-4": TAMPA, "seed-5": TAMPA,
+  "seed-6": fsp("hillsborough-river-state-park"),
+  "seed-7": fsp("anclote-key-preserve-state-park"),
+  "seed-8": fsp("caladesi-island-state-park"),
+  "seed-9": fsp("alafia-river-state-park"),
+  "seed-10": fsp("rainbow-springs-state-park"),
+  "seed-11": fsp("honeymoon-island-state-park"),
+  "seed-12": TAMPA, "seed-13": TAMPA, "seed-14": TAMPA, "seed-15": TAMPA,
+  "seed-16": HC_CONSERVATION, "seed-17": HC_CONSERVATION, "seed-18": HC_CONSERVATION,
+  "seed-19": TAMPA, "seed-20": TAMPA, "seed-21": TAMPA, "seed-22": TAMPA, "seed-23": TAMPA,
+  "seed-24": TAMPA, "seed-25": TAMPA, "seed-26": TAMPA, "seed-27": TAMPA, "seed-28": TAMPA,
+  "seed-29": TAMPA, "seed-30": TAMPA, "seed-31": TAMPA, "seed-32": TAMPA, "seed-33": TAMPA,
+  "seed-34": TAMPA,
+  "seed-35": PINELLAS,
+  "seed-36": STPETE, "seed-37": STPETE, "seed-38": STPETE, "seed-39": STPETE,
+  "seed-40": STPETE, "seed-41": STPETE,
+  "seed-42": PINELLAS,
+  "seed-43": "https://pinellas.gov/parks/weedon-island-preserve/",
+  "seed-44": STPETE, "seed-45": STPETE,
+  "seed-46": CLEARWATER, "seed-47": CLEARWATER, "seed-48": CLEARWATER, "seed-49": CLEARWATER,
+  "seed-50": PINELLAS,
+  "seed-51": CLEARWATER, "seed-52": CLEARWATER, "seed-53": CLEARWATER,
+  "seed-54": PINELLAS,
+  "seed-55": LARGO,
+  "seed-56": PINELLAS, "seed-57": PINELLAS, "seed-58": PINELLAS, "seed-64": PINELLAS, "seed-65": PINELLAS,
+  "seed-59": DUNEDIN, "seed-60": DUNEDIN, "seed-61": DUNEDIN, "seed-62": DUNEDIN, "seed-63": DUNEDIN,
+  "seed-66": HC_GENERAL, "seed-67": HC_GENERAL, "seed-68": HC_GENERAL, "seed-70": HC_GENERAL,
+  "seed-69": HC_CONSERVATION,
+  "seed-71": TEMPLE_TERRACE, "seed-72": TEMPLE_TERRACE, "seed-73": TEMPLE_TERRACE,
+  "seed-74": HC_CONSERVATION, "seed-75": HC_CONSERVATION,
+  "seed-76": PASCO, "seed-77": PASCO, "seed-78": PASCO, "seed-79": PASCO, "seed-80": PASCO,
+  "seed-82": PASCO, "seed-83": PASCO, "seed-86": PASCO,
+  "seed-81": NPR_CITY, "seed-84": NPR_CITY, "seed-85": NPR_CITY,
+  "seed-87": "https://bonnetspringspark.com/",
+  "seed-88": LAKELAND, "seed-89": LAKELAND, "seed-91": LAKELAND,
+  "seed-90": POLK,
+  "seed-92": WINTERHAVEN, "seed-93": WINTERHAVEN, "seed-94": WINTERHAVEN, "seed-95": WINTERHAVEN,
+  "seed-96": SARASOTA_CITY, "seed-97": SARASOTA_CITY, "seed-98": SARASOTA_CITY, "seed-99": SARASOTA_CITY,
+  "seed-100": SARASOTA_CITY, "seed-102": SARASOTA_CITY, "seed-103": SARASOTA_CITY,
+  "seed-106": SARASOTA_CITY, "seed-107": SARASOTA_CITY, "seed-108": SARASOTA_CITY,
+  "seed-101": SARASOTA_COUNTY,
+  "seed-104": fsp("oscar-scherer-state-park"),
+  "seed-105": VENICE,
+  "seed-109": MANATEE, "seed-110": MANATEE, "seed-111": MANATEE, "seed-112": MANATEE,
+  "seed-113": MANATEE, "seed-114": MANATEE, "seed-115": MANATEE, "seed-116": MANATEE,
+  "seed-117": MANATEE, "seed-118": MANATEE, "seed-119": MANATEE,
+};
+
+function getParkWebsite(park) {
+  return PARK_WEBSITES[park.id] || park.website || null;
+}
+
+const SEED_PARKS = [
+  {
+    id: "seed-1",
+    name: "Ballast Point Park",
+    type: "city",
+    address: "5300 Interbay Blvd, Tampa, FL 33611",
+    hours: "Daily, 6:00 AM – 8:00 PM",
+    activities: ["Playground", "Fishing", "Water / Beach", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "Waterfront views, fishing pier (check for closures).",
+  },
+  {
+    id: "seed-2",
+    name: "Julian B. Lane Riverfront Park",
+    type: "city",
+    address: "1001 N Blvd, Tampa, FL 33607",
+    hours: "Daily, 7:00 AM – 10:00 PM",
+    activities: ["Splash Pad", "Sports Courts", "Picnic Area", "Hiking Trails"],
+    rating: 4.8,
+    infoNote: "Basketball, tennis, pickleball, splash pad, river views.",
+  },
+  {
+    id: "seed-3",
+    name: "Perry Harvey Sr. Park",
+    type: "city",
+    address: "1000 E Harrison St, Tampa, FL 33602",
+    hours: "Daily, 7:00 AM – 10:00 PM",
+    activities: ["Splash Pad", "Picnic Area"],
+    rating: 4.6,
+    infoNote: "Historic markers and public art throughout.",
+  },
+  {
+    id: "seed-4",
+    name: "Ragan Park",
+    type: "city",
+    address: "1200 E Lake Ave, Tampa, FL 33605",
+    hours: "Daily, 7:00 AM – 6:00 PM",
+    activities: ["Playground", "Picnic Area"],
+    rating: 4.4,
+    infoNote: "Walking loop around a small pond.",
+  },
+  {
+    id: "seed-19",
+    name: "Curtis Hixon Waterfront Park",
+    type: "city",
+    address: "600 N Ashley Dr, Tampa, FL 33602",
+    hours: "Daily, 7:00 AM – 10:00 PM",
+    activities: ["Picnic Area", "Sports Courts", "Splash Pad"],
+    rating: 4.7,
+    infoNote: "Downtown riverfront green space, hosts markets and events, connects to the Riverwalk.",
+  },
+  {
+    id: "seed-20",
+    name: "Cotanchobee Fort Brooke Park",
+    type: "city",
+    address: "601 Water St, Tampa, FL 33602",
+    hours: "Daily, 7:00 AM – 10:00 PM",
+    activities: ["Playground", "Picnic Area"],
+    rating: 4.5,
+    infoNote: "Small waterfront park near the History Center; no restrooms on site.",
+  },
+  {
+    id: "seed-21",
+    name: "Cypress Point Park",
+    type: "city",
+    address: "5620 W Cypress St, Tampa, FL 33607",
+    hours: "Daily, sunrise – sunset (check posted signage)",
+    activities: ["Water / Beach", "Playground", "Picnic Area"],
+    rating: 4.5,
+    infoNote: "Small beach near the airport flight path. Free parking weekdays; dogs not allowed on the beach.",
+  },
+  {
+    id: "seed-22",
+    name: "Tampa Riverwalk",
+    type: "city",
+    address: "Riverwalk, Tampa, FL 33602",
+    hours: "Open 24 hours",
+    activities: ["Biking", "Hiking Trails", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "~2.6-mile paved path connecting downtown parks, museums, and restaurants.",
+  },
+  {
+    id: "seed-23",
+    name: "Rivercrest Park",
+    type: "city",
+    address: "4802 N Blvd, Tampa, FL 33603",
+    hours: "Daily, 7:00 AM – 9:00 PM",
+    activities: ["Playground", "Hiking Trails", "Picnic Area"],
+    rating: 4.6,
+    infoNote: "About a 0.7-mile loop along the river. Small parking lot, some street parking.",
+  },
+  {
+    id: "seed-24",
+    name: "Giddens Park",
+    type: "city",
+    address: "5202 N 12th St, Tampa, FL 33603",
+    hours: "Daily, 6:00 AM – 9:00 PM",
+    activities: ["Playground", "Splash Pad", "Sports Courts", "Picnic Area"],
+    rating: 4.2,
+    infoNote: "Community center on site. Can get busy on weekends.",
+  },
+  {
+    id: "seed-25",
+    name: "Henry & Ola Park",
+    type: "city",
+    address: "502 W Henry Ave, Tampa, FL 33604",
+    hours: "Daily, 6:30 AM – 8:00 PM",
+    activities: ["Dog-Friendly", "Sports Courts", "Playground"],
+    rating: 4.5,
+    infoNote: "Seminole Heights favorite — large dog park plus baseball and basketball courts.",
+  },
+  {
+    id: "seed-26",
+    name: "Epps Park",
+    type: "city",
+    address: "350 W Fern St, Tampa, FL 33604",
+    hours: "Daily, 7:00 AM – 7:00 PM",
+    activities: ["Water / Beach", "Picnic Area"],
+    rating: 4.5,
+    infoNote: "Quiet riverfront green space in Old Seminole Heights. Limited parking, no formal playground.",
+  },
+  {
+    id: "seed-27",
+    name: "Rowlett Park",
+    type: "city",
+    address: "2401 E Yukon St, Tampa, FL 33604",
+    hours: "Daily, 7:00 AM – 10:00 PM",
+    activities: ["Sports Courts", "Dog-Friendly", "Playground", "Hiking Trails", "Picnic Area"],
+    rating: 4.5,
+    infoNote: "Big park — pickleball/tennis courts, dog park, miles of paved trails, lakes.",
+  },
+  {
+    id: "seed-28",
+    name: "Water Works Park",
+    type: "city",
+    address: "1701 N Highland Ave, Tampa, FL 33602",
+    hours: "Daily, 7:00 AM – 10:00 PM",
+    activities: ["Splash Pad", "Dog-Friendly", "Playground", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "Next to Armature Works. Fenced playground and dog park, splash pad for kids.",
+  },
+  {
+    id: "seed-29",
+    name: "Marcelino Chelo Huerta Jr Friendship Park",
+    type: "city",
+    address: "4124 W Bay to Bay Blvd, Tampa, FL 33629",
+    hours: "Daily, 8:00 AM – 7:00 PM",
+    activities: ["Playground", "Picnic Area"],
+    rating: 4.6,
+    infoNote: "South Tampa neighborhood favorite — shaded, gazebo/pavilion reservable for parties. Street parking only.",
+  },
+  {
+    id: "seed-30",
+    name: "Anderson Park",
+    type: "city",
+    address: "802 S Rome Ave, Tampa, FL 33606",
+    hours: "Daily, 7:00 AM – 8:00 PM",
+    activities: ["Playground", "Splash Pad", "Sports Courts"],
+    rating: 4.7,
+    infoNote: "Hyde Park area, walkable to shops/restaurants. Splash pad closes at 7 PM; limited parking.",
+  },
+  {
+    id: "seed-31",
+    name: "Harvest Hope Park",
+    type: "city",
+    address: "13704 N 20th St, Tampa, FL 33613",
+    hours: "Daily, 7:00 AM – 8:00 PM",
+    activities: ["Playground", "Sports Courts", "Picnic Area"],
+    rating: 4.5,
+    infoNote: "Community garden on site, open to the public certain mornings — pond, football field, adult exercise equipment.",
+  },
+  {
+    id: "seed-32",
+    name: "Al Lopez Park",
+    type: "city",
+    address: "4810 N Himes Ave, Tampa, FL 33614",
+    hours: "Daily, hours vary by season",
+    activities: ["Hiking Trails", "Playground", "Fishing", "Picnic Area", "Dog-Friendly"],
+    rating: 4.7,
+    infoNote: "Large park with paved trails, two ponds, fishing pier, and the attached dog park. Free parking.",
+  },
+  {
+    id: "seed-33",
+    name: "Foster Park",
+    type: "city",
+    address: "4700 S Clark Ave, Tampa, FL 33611",
+    hours: "Daily, 7:00 AM – 7:00 PM",
+    activities: ["Playground", "Sports Courts", "Picnic Area"],
+    rating: 4.5,
+    infoNote: "South Tampa neighborhood park — baseball diamond, basketball court, fenced shaded playground. Small dirt parking lot.",
+  },
+  {
+    id: "seed-34",
+    name: "Picnic Island Park",
+    type: "city",
+    address: "7404 Picnic Island Blvd, Tampa, FL 33616",
+    hours: "Daily, hours vary by season",
+    activities: ["Water / Beach", "Fishing", "Dog-Friendly", "Playground", "Picnic Area", "Kayaking / Boating"],
+    rating: 4.6,
+    infoNote: "South Tampa spot with a dog beach, disc golf, canoe launch, and paddleboard rentals — plane-watching too.",
+  },
+  {
+    id: "seed-35",
+    name: "Sawgrass Lake Park",
+    type: "nature",
+    address: "7400 25th St N, St. Petersburg, FL 33702",
+    hours: "Daily, hours vary — check posted signage",
+    activities: ["Hiking Trails"],
+    rating: 4.7,
+    infoNote: "Boardwalk trails through wetlands, observation tower, alligators and wading birds. Free parking.",
+  },
+  {
+    id: "seed-36",
+    name: "Boyd Hill Nature Preserve",
+    type: "nature",
+    address: "1101 Country Club Way S, St. Petersburg, FL 33705",
+    hours: "Tue–Sun, 9:00 AM – 7:00 PM (Sat from 7:00 AM); closed Mon",
+    activities: ["Hiking Trails"],
+    rating: 4.7,
+    infoNote: "$3 admission per person. Trails, tram tours, bird-of-prey sanctuary. Dogs not allowed.",
+  },
+  {
+    id: "seed-37",
+    name: "Vinoy Park",
+    type: "city",
+    address: "701 Bayshore Dr NE, St. Petersburg, FL 33701",
+    hours: "Daily, 6:00 AM – 11:00 PM",
+    activities: ["Picnic Area", "Biking"],
+    rating: 4.8,
+    infoNote: "Downtown St. Pete waterfront green space, popular for festivals and concerts.",
+  },
+  {
+    id: "seed-38",
+    name: "North Straub Park",
+    type: "city",
+    address: "400 Bayshore Dr NE, St. Petersburg, FL 33701",
+    hours: "Open 24 hours",
+    activities: ["Picnic Area"],
+    rating: 4.7,
+    infoNote: "Waterfront park with mature banyan trees, near the St. Pete Pier. Metered parking.",
+  },
+  {
+    id: "seed-39",
+    name: "North Shore Park",
+    type: "city",
+    address: "901 N Shore Dr NE, St. Petersburg, FL 33701",
+    hours: "Daily, hours vary by season",
+    activities: ["Playground", "Splash Pad", "Sports Courts", "Water / Beach"],
+    rating: 4.7,
+    infoNote: "Public pool, tennis and volleyball courts, waterfront promenade.",
+  },
+  {
+    id: "seed-40",
+    name: "Dell Holmes Park",
+    type: "city",
+    address: "2741 22nd St S, St. Petersburg, FL 33712",
+    hours: "Daily, 7:00 AM – 8:00 PM",
+    activities: ["Playground", "Splash Pad", "Picnic Area", "Dog-Friendly"],
+    rating: 4.6,
+    infoNote: "Large fenced, all-abilities playground, splash pad, several pavilions.",
+  },
+  {
+    id: "seed-41",
+    name: "Demens Landing Park",
+    type: "city",
+    address: "525-549 2nd Ave SE, St. Petersburg, FL 33701",
+    hours: "Daily, 7:10 AM – 11:00 PM",
+    activities: ["Fishing", "Water / Beach"],
+    rating: 4.7,
+    infoNote: "Boat ramp, plane-watching, close to the St. Pete Pier. Free parking.",
+  },
+  {
+    id: "seed-42",
+    name: "Abercrombie Park",
+    type: "nature",
+    address: "Park St N & 38th Ave N, St. Petersburg, FL 33709",
+    hours: "Daily, 6:00 AM – 8:00 PM",
+    activities: ["Hiking Trails", "Dog-Friendly"],
+    rating: 4.7,
+    infoNote: "Small hidden gem — hilly boardwalk trails, waterfront views, historic Native American mounds.",
+  },
+  {
+    id: "seed-43",
+    name: "Weedon Island Preserve",
+    type: "nature",
+    address: "1800 Weedon Dr NE, St. Petersburg, FL 33702",
+    hours: "Daily, hours vary by season",
+    activities: ["Hiking Trails", "Kayaking / Boating"],
+    rating: 4.8,
+    infoNote: "Miles of boardwalks through mangroves, cultural history center. No dogs, bikes, or scooters on trails.",
+  },
+  {
+    id: "seed-44",
+    name: "Crescent Lake Dog Park",
+    type: "dog",
+    address: "617 12th Ave N, St. Petersburg, FL 33701",
+    hours: "Daily, hours vary — check posted signage",
+    activities: ["Dog-Friendly"],
+    rating: 4.7,
+    infoNote: "Separate small/large dog areas, lake views, shaded.",
+  },
+  {
+    id: "seed-45",
+    name: "Small Dogs Park at Vinoy Park",
+    type: "dog",
+    address: "Unnamed Road, St. Petersburg, FL 33701",
+    hours: "Open 24 hours",
+    activities: ["Dog-Friendly"],
+    rating: 4.8,
+    infoNote: "Waterfront dog park near the pier, separated large/small dog areas.",
+  },
+  {
+    id: "seed-46",
+    name: "Coachman Park",
+    type: "city",
+    address: "300 Cleveland St, Clearwater, FL 33756",
+    hours: "Daily, 5:00 AM – 12:00 AM",
+    activities: ["Splash Pad", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "Waterfront concert venue (BayCare Sound), splash pad, ferry to Clearwater Beach.",
+  },
+  {
+    id: "seed-47",
+    name: "Crest Lake Park",
+    type: "city",
+    address: "201 S Glenwood Ave, Clearwater, FL 33755",
+    hours: "Daily, 6:00 AM – 9:00 PM",
+    activities: ["Playground", "Fishing", "Dog-Friendly", "Sports Courts"],
+    rating: 4.6,
+    infoNote: "Lake loop trail, catch-and-release fishing, fitness stations, dog park on site.",
+  },
+  {
+    id: "seed-48",
+    name: "Moccasin Lake Nature Park",
+    type: "nature",
+    address: "2750 Park Trail Ln, Clearwater, FL 33759",
+    hours: "Tue–Sun, 10:00 AM – 5:00 PM; closed Mon",
+    activities: ["Hiking Trails", "Playground"],
+    rating: 4.7,
+    infoNote: "Nature center, rescued birds of prey, trails around Moccasin Lake.",
+  },
+  {
+    id: "seed-49",
+    name: "Pier 60 Park",
+    type: "city",
+    address: "Causeway Blvd, Clearwater Beach, FL 33767",
+    hours: "Daily, 7:00 AM – 10:00 PM",
+    activities: ["Water / Beach", "Fishing"],
+    rating: 4.7,
+    infoNote: "Clearwater Beach fishing pier, sunset celebrations, evening market. Small fee to walk to the pier's end.",
+  },
+  {
+    id: "seed-50",
+    name: "Sand Key Park",
+    type: "city",
+    address: "1060 Gulf Blvd, Clearwater, FL 33767",
+    hours: "Daily, hours vary by season",
+    activities: ["Water / Beach", "Dog-Friendly", "Playground", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "Gulf-front beach, dog park, showers and changing rooms. ~$6/day parking.",
+  },
+  {
+    id: "seed-51",
+    name: "Enterprise Dog Park",
+    type: "dog",
+    address: "2655 Enterprise Rd E, Clearwater, FL 33759",
+    hours: "Varies by day — roughly 6:30 AM – 7:30 PM",
+    activities: ["Dog-Friendly"],
+    rating: 4.8,
+    infoNote: "Wooded, shaded trails for off-leash dogs, agility area, multiple water stations.",
+  },
+  {
+    id: "seed-52",
+    name: "Crest Lake Dog Park",
+    type: "dog",
+    address: "332 S Glenwood Ave, Clearwater, FL 33755",
+    hours: "Open 24 hours",
+    activities: ["Dog-Friendly"],
+    rating: 4.8,
+    infoNote: "Four fenced areas by dog size, paved walk around the lake.",
+  },
+  {
+    id: "seed-53",
+    name: "Northeast Park & Paw Place",
+    type: "dog",
+    address: "4630 E Bay Dr, Clearwater, FL 33764",
+    hours: "Daily, 7:00 AM – 10:00 PM",
+    activities: ["Dog-Friendly"],
+    rating: 4.3,
+    infoNote: "Large/small dog sides, walking trail, some shade.",
+  },
+  {
+    id: "seed-54",
+    name: "Eagle Lake Park",
+    type: "nature",
+    address: "1800 Keene Rd, Largo, FL 33771",
+    hours: "Daily, hours vary by season",
+    activities: ["Hiking Trails", "Playground", "Fishing", "Dog-Friendly"],
+    rating: 4.8,
+    infoNote: "Boardwalks over lakes and ponds, paved and natural trails, dog park.",
+  },
+  {
+    id: "seed-55",
+    name: "Largo Central Park Nature Preserve",
+    type: "nature",
+    address: "150 Highland Ave SE N, Largo, FL 33770",
+    hours: "Daily, 6:30 AM – 8:00 PM",
+    activities: ["Hiking Trails", "Dog-Friendly"],
+    rating: 4.7,
+    infoNote: "Boardwalk and paved loop around a lake, observation tower, free.",
+  },
+  {
+    id: "seed-56",
+    name: "Walsingham Park",
+    type: "nature",
+    address: "12615 102nd Ave N, Seminole, FL 33778",
+    hours: "Daily, hours vary by season",
+    activities: ["Hiking Trails", "Biking", "Dog-Friendly", "Picnic Area"],
+    rating: 4.8,
+    infoNote: "Wooded trails plus open lawn, dog park, across from the Pinellas botanical gardens.",
+  },
+  {
+    id: "seed-57",
+    name: "Lake Seminole Park",
+    type: "nature",
+    address: "10015 Park Blvd, Seminole, FL 33777",
+    hours: "Daily, hours vary by season",
+    activities: ["Hiking Trails", "Biking", "Fishing", "Dog-Friendly", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "Two-mile paved trail, boat ramps, picnic shelters — a Pinellas County favorite.",
+  },
+  {
+    id: "seed-58",
+    name: "Boca Ciega Millennium Park",
+    type: "nature",
+    address: "12410 74th Ave N, Seminole, FL 33772",
+    hours: "Daily, 7:00 AM – 6:30 PM",
+    activities: ["Hiking Trails", "Playground", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "Boardwalk and observation tower over Boca Ciega Bay. Dogs not allowed.",
+  },
+  {
+    id: "seed-59",
+    name: "Josiah Cephas Weaver Park",
+    type: "city",
+    address: "1258 Bayshore Blvd, Dunedin, FL 34698",
+    hours: "Daily, 7:00 AM – 8:30 PM",
+    activities: ["Water / Beach"],
+    rating: 4.7,
+    infoNote: "Sunset-viewing lawn on the water; small entry fee for the adjacent beach.",
+  },
+  {
+    id: "seed-60",
+    name: "Edgewater Park",
+    type: "city",
+    address: "51 Main St, Dunedin, FL 34698",
+    hours: "Daily, 7:00 AM – 8:00 PM",
+    activities: ["Playground", "Picnic Area", "Dog-Friendly"],
+    rating: 4.7,
+    infoNote: "Marina views, small pier, walkable from downtown Dunedin.",
+  },
+  {
+    id: "seed-61",
+    name: "Hammock Park",
+    type: "nature",
+    address: "1900 San Mateo Dr, Dunedin, FL 34698",
+    hours: "Daily, 6:00 AM – 8:00 PM",
+    activities: ["Hiking Trails", "Playground", "Dog-Friendly", "Biking"],
+    rating: 4.7,
+    infoNote: "Boardwalks through native Florida habitat, butterfly garden, part of the Pinellas Trail.",
+  },
+  {
+    id: "seed-62",
+    name: "Highlander Park",
+    type: "city",
+    address: "903 Michigan Blvd, Dunedin, FL 34698",
+    hours: "Daily, 7:00 AM – 8:30 PM",
+    activities: ["Splash Pad", "Sports Courts"],
+    rating: 4.7,
+    infoNote: "Splash pad and public pool ($3), hosts the Dunedin Highland Games.",
+  },
+  {
+    id: "seed-63",
+    name: "Amberlea Park",
+    type: "city",
+    address: "1680 Amberlea Dr N, Dunedin, FL 34698",
+    hours: "Daily, 7:00 AM – 8:00 PM",
+    activities: ["Playground", "Picnic Area"],
+    rating: 4.5,
+    infoNote: "Shaded playground under large oaks, climbing-focused equipment for older kids. No restrooms.",
+  },
+  {
+    id: "seed-64",
+    name: "Wall Springs Park",
+    type: "nature",
+    address: "3725 Desoto Blvd, Palm Harbor, FL 34683",
+    hours: "Daily, hours vary by season",
+    activities: ["Hiking Trails", "Water / Beach", "Playground", "Picnic Area", "Dog-Friendly"],
+    rating: 4.8,
+    infoNote: "Spring-fed park with boardwalk, observation tower, butterfly garden. Dogs not allowed on boardwalk/tower.",
+  },
+  {
+    id: "seed-65",
+    name: "Brooker Creek Preserve",
+    type: "nature",
+    address: "3940 Keystone Rd, Tarpon Springs, FL 34688",
+    hours: "Thu–Sun, 9:00 AM – 4:00 PM (Sun from 11:00 AM); closed Mon–Wed",
+    activities: ["Hiking Trails"],
+    rating: 4.8,
+    infoNote: "Free environmental education center, long interconnected trail loops, can be muddy after rain.",
+  },
+  {
+    id: "seed-66",
+    name: "All Person's Rotary Park",
+    type: "city",
+    address: "800 S Parsons Ave, Brandon, FL 33511",
+    hours: "Daily, 8:00 AM – 8:00 PM",
+    activities: ["Playground", "Splash Pad"],
+    rating: 4.5,
+    infoNote: "Fully ADA-accessible, gated splash pad and playground.",
+  },
+  {
+    id: "seed-67",
+    name: "Paul Sanders Park",
+    type: "city",
+    address: "602 W Bloomingdale Ave, Brandon, FL 33511",
+    hours: "Daily, 8:00 AM – 8:00 PM",
+    activities: ["Playground", "Picnic Area"],
+    rating: 4.6,
+    infoNote: "Large shaded playground, dinosaur-themed play structures, rentable pavilions.",
+  },
+  {
+    id: "seed-68",
+    name: "Bertha and Tony Saladino Park",
+    type: "city",
+    address: "1705 Bryan Rd, Brandon, FL 33511",
+    hours: "Daily, 8:00 AM – 8:00 PM",
+    activities: ["Dog-Friendly", "Sports Courts", "Playground", "Biking"],
+    rating: 4.6,
+    infoNote: "Paved trail, playground, and a well-regarded large/small dog park with wash station.",
+  },
+  {
+    id: "seed-69",
+    name: "Alafia Scrub Nature Preserve",
+    type: "nature",
+    address: "10243 Elbow Bend Rd, Riverview, FL 33578",
+    hours: "Daily, hours vary by season",
+    activities: ["Hiking Trails"],
+    rating: 4.3,
+    infoNote: "Quiet, well-marked trails leading to a riverside boardwalk on the Alafia River.",
+  },
+  {
+    id: "seed-70",
+    name: "Pebble Park",
+    type: "nature",
+    address: "9955 Riverview Dr, Riverview, FL 33578",
+    hours: "Daily, 8:00 AM – 7:00 PM",
+    activities: ["Hiking Trails", "Dog-Friendly", "Picnic Area"],
+    rating: 4.3,
+    infoNote: "Small riverside park, mix of paved and shaded trail, gopher tortoise habitat.",
+  },
+  {
+    id: "seed-71",
+    name: "Riverhills Park",
+    type: "city",
+    address: "329 S Riverhills Dr, Temple Terrace, FL 33617",
+    hours: "Daily, 8:00 AM – 6:00 PM",
+    activities: ["Playground", "Fishing", "Picnic Area"],
+    rating: 4.6,
+    infoNote: "Boardwalk along the Hillsborough River, boat launch, memorial plaques.",
+  },
+  {
+    id: "seed-72",
+    name: "Temple Terrace Riverfront Preserve Park",
+    type: "nature",
+    address: "7801 Capwood Ave, Temple Terrace, FL 33637",
+    hours: "Daily, 6:30 AM – 8:30 PM",
+    activities: ["Hiking Trails", "Biking"],
+    rating: 4.4,
+    infoNote: "Quiet forested trails along the river; occasionally gated despite posted hours — worth a call ahead.",
+  },
+  {
+    id: "seed-73",
+    name: "West River Preserve",
+    type: "nature",
+    address: "Temple Terrace, FL 33617",
+    hours: "Daily, hours vary — check posted signage",
+    activities: ["Hiking Trails"],
+    rating: 4.6,
+    infoNote: "Small, little-known preserve with a river-front hiking trail. Limited parking, watch for alligators.",
+  },
+  {
+    id: "seed-74",
+    name: "Lithia Springs Park",
+    type: "nature",
+    address: "3932 Lithia Springs Rd, Lithia, FL 33547",
+    hours: "Daily, 8:00 AM – 6:00 PM",
+    activities: ["Hiking Trails", "Water / Beach", "Camping", "Picnic Area", "Kayaking / Boating"],
+    rating: 4.3,
+    infoNote: "Hillsborough County park with a swimmable spring ($2 fee), camping, canoe/kayak launch.",
+  },
+  {
+    id: "seed-75",
+    name: "E.G. Simmons Conservation Park",
+    type: "nature",
+    address: "2401 19th Ave NW, Ruskin, FL 33570",
+    hours: "Daily, 8:00 AM – 6:00 PM",
+    activities: ["Fishing", "Kayaking / Boating", "Camping", "Water / Beach", "Hiking Trails"],
+    rating: 4.5,
+    infoNote: "$2/car entry. Mangrove-lined kayak trails, manatee sightings, camping and boat ramps.",
+  },
+  {
+    id: "seed-76",
+    name: "Key Vista Nature Park",
+    type: "nature",
+    address: "2700 Baillies Bluff Road, Holiday, FL 34691",
+    hours: "Daily, 8:00 AM – 6:00 PM",
+    activities: ["Hiking Trails", "Dog-Friendly"],
+    rating: 4.7,
+    infoNote: "Pasco County — sandy boardwalk trails, 3-story observation tower, restoration area (no swimming).",
+  },
+  {
+    id: "seed-77",
+    name: "Crews Lake Wilderness Park",
+    type: "nature",
+    address: "16739 Crews Lake Dr, Shady Hills, FL 34610",
+    hours: "Daily, hours vary by season",
+    activities: ["Hiking Trails", "Playground", "Camping", "Dog-Friendly"],
+    rating: 4.7,
+    infoNote: "Pasco County — large park, observation tower, pier, small kids' train, some cabin rentals.",
+  },
+  {
+    id: "seed-78",
+    name: "Jay B. Starkey Wilderness Park",
+    type: "nature",
+    address: "10500 Wilderness Park Blvd, New Port Richey, FL 34655",
+    hours: "Daily, hours vary by season",
+    activities: ["Hiking Trails", "Biking", "Camping", "Dog-Friendly"],
+    rating: 4.7,
+    infoNote: "Pasco County — miles of paved and off-road trails, horseback riding, frequent wildlife sightings.",
+  },
+  {
+    id: "seed-79",
+    name: "James E. Grey Preserve",
+    type: "nature",
+    address: "6938 Plathe Rd, New Port Richey, FL 34653",
+    hours: "Daily, hours vary by season",
+    activities: ["Hiking Trails", "Playground", "Fishing", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "Pasco County — paved riverside path, boardwalk, boat ramp; manatee sightings reported.",
+  },
+  {
+    id: "seed-80",
+    name: "Starkey Wilderness Park Playground",
+    type: "nature",
+    address: "11115 Wilderness Park Blvd, New Port Richey, FL 34655",
+    hours: "Daily, 7:00 AM – 6:00 PM",
+    activities: ["Playground", "Hiking Trails", "Camping"],
+    rating: 4.8,
+    infoNote: "Pasco County — multiple play structures, campground with tent loop, bird blind nearby.",
+  },
+  {
+    id: "seed-81",
+    name: "Sims Park",
+    type: "city",
+    address: "Grand Blvd & Bank St, New Port Richey, FL 34652",
+    hours: "Daily, hours vary — check posted signage",
+    activities: ["Picnic Area", "Sports Courts"],
+    rating: 4.7,
+    infoNote: "Pasco County — walkable from historic downtown New Port Richey, lake/river views, hosts events and concerts.",
+  },
+  {
+    id: "seed-82",
+    name: "Wesley Chapel District Park",
+    type: "city",
+    address: "7727 Boyette Rd, Wesley Chapel, FL 33545",
+    hours: "Daily, 6:00 AM – 10:00 PM",
+    activities: ["Playground", "Sports Courts", "Biking", "Dog-Friendly"],
+    rating: 4.6,
+    infoNote: "Pasco County — large sports complex with multiple fields/courts, paved trail, pet friendly.",
+  },
+  {
+    id: "seed-83",
+    name: "Seven Oaks Nature Trail",
+    type: "nature",
+    address: "Wesley Chapel, FL 33544",
+    hours: "Daily, hours vary — check posted signage",
+    activities: ["Hiking Trails", "Biking"],
+    rating: 4.3,
+    infoNote: "Pasco County — paved trail over 3 miles through the Seven Oaks community; entrance can be tricky to find (look for the white pergola off Summergate).",
+  },
+  {
+    id: "seed-84",
+    name: "Cotee River Park",
+    type: "city",
+    address: "7004 Grand Blvd, New Port Richey, FL 34652",
+    hours: "Open 24 hours",
+    activities: ["Picnic Area"],
+    rating: 4.8,
+    infoNote: "Pasco County — quiet shaded gazebos along the Cotee River, good spot to watch boats and dolphins.",
+  },
+  {
+    id: "seed-85",
+    name: "Robert K Rees Memorial Park",
+    type: "city",
+    address: "3503 Green Key Rd, New Port Richey, FL 34652",
+    hours: "Daily, closes ~17 minutes after sunset",
+    activities: ["Water / Beach", "Playground", "Picnic Area"],
+    rating: 4.4,
+    infoNote: "Pasco County — small sunset-viewing beach, boardwalk through mangroves. Check tide before swimming.",
+  },
+  {
+    id: "seed-86",
+    name: "Port Richey Waterfront Park",
+    type: "city",
+    address: "8119 Old Post Rd, Port Richey, FL 34668",
+    hours: "Daily, 6:30 AM – 8:30 PM",
+    activities: ["Playground", "Fishing", "Dog-Friendly"],
+    rating: 4.5,
+    infoNote: "Pasco County — two playgrounds, small fishing pier on the Cotee River, dog park area on site.",
+  },
+  {
+    id: "seed-87",
+    name: "Bonnet Springs Park",
+    type: "city",
+    address: "400 Bonnet Spgs Blvd, Lakeland, FL 33815",
+    hours: "Daily, 6:00 AM – 7:30 PM",
+    activities: ["Playground", "Biking", "Hiking Trails", "Picnic Area"],
+    rating: 4.9,
+    infoNote: "Polk County — nationally recognized city park, tram circulator, elevated walkways, nature center, several playgrounds.",
+  },
+  {
+    id: "seed-88",
+    name: "Barnett Family Park",
+    type: "city",
+    address: "730 E Orange St, Lakeland, FL 33801",
+    hours: "Daily, hours vary — check posted signage",
+    activities: ["Playground", "Splash Pad", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "Polk County — fenced playground, splash pad, walking path around Lake Mirror.",
+  },
+  {
+    id: "seed-89",
+    name: "Common Ground Playground",
+    type: "city",
+    address: "1000 E Edgewood Dr, Lakeland, FL 33803",
+    hours: "Daily, 8:00 AM – 6:00 PM (Wed from 10:00 AM)",
+    activities: ["Playground", "Picnic Area"],
+    rating: 4.8,
+    infoNote: "Polk County — fully gated, multiple play zones for different ages, small botanical garden on site.",
+  },
+  {
+    id: "seed-90",
+    name: "Polk's Nature Discovery Center",
+    type: "nature",
+    address: "4399 Winter Lake Rd, Lakeland, FL 33803",
+    hours: "Tue–Sun, 9:00 AM – 4:00 PM (Sun from 12:00 PM); closed Mon",
+    activities: ["Hiking Trails"],
+    rating: 4.8,
+    infoNote: "Polk County — free conservation area, indoor discovery center, alligators and wading birds along the trails.",
+  },
+  {
+    id: "seed-91",
+    name: "Hernandos Landing Rotary Playground at Lake Parker Park",
+    type: "city",
+    address: "910 Granada St, Lakeland, FL 33805",
+    hours: "Daily, 7:00 AM – 8:00 PM",
+    activities: ["Playground", "Hiking Trails", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "Polk County — accessible playground with zipline, walking trail along Lake Parker.",
+  },
+  {
+    id: "seed-92",
+    name: "Trailhead Park",
+    type: "city",
+    address: "301 Avenue G NW, Winter Haven, FL 33881",
+    hours: "Daily, 7:00 AM – 7:00 PM",
+    activities: ["Playground", "Splash Pad", "Picnic Area"],
+    rating: 4.6,
+    infoNote: "Polk County — sits on the Chain of Lakes Trail near downtown Winter Haven, splash pad on site.",
+  },
+  {
+    id: "seed-93",
+    name: "South Lake Howard Nature Park",
+    type: "nature",
+    address: "1570 Lake Howard Dr SW, Winter Haven, FL 33880",
+    hours: "Daily, 6:30 AM – 8:00 PM",
+    activities: ["Hiking Trails", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "Polk County — cypress forest boardwalk, free admission, popular for birdwatching.",
+  },
+  {
+    id: "seed-94",
+    name: "Rotary Park",
+    type: "city",
+    address: "350 6th St NE, Winter Haven, FL 33881",
+    hours: "Daily, 8:00 AM – 8:00 PM",
+    activities: ["Playground", "Picnic Area"],
+    rating: 4.3,
+    infoNote: "Polk County — recently updated playground equipment, good natural shade.",
+  },
+  {
+    id: "seed-95",
+    name: "Kiwanis Park",
+    type: "city",
+    address: "301 Ave C NE, Winter Haven, FL 33881",
+    hours: "Daily, 6:30 AM – 8:00 PM",
+    activities: ["Playground", "Fishing", "Picnic Area"],
+    rating: 4.1,
+    infoNote: "Polk County — two playgrounds by age, small fishing dock on the lake.",
+  },
+  {
+    id: "seed-96",
+    name: "Bayfront Park",
+    type: "city",
+    address: "5 Bayfront Dr, Sarasota, FL 34236",
+    hours: "Daily, 5:00 AM – 11:00 PM",
+    activities: ["Playground", "Splash Pad", "Dog-Friendly", "Water / Beach"],
+    rating: 4.8,
+    infoNote: "Sarasota — downtown waterfront park, marina views, illuminated splash pad, dog-friendly.",
+  },
+  {
+    id: "seed-97",
+    name: "The Bay Park",
+    type: "city",
+    address: "1055 Boulevard of the Arts, Sarasota, FL 34236",
+    hours: "Daily, 5:00 AM – 11:00 PM",
+    activities: ["Playground", "Picnic Area", "Water / Beach"],
+    rating: 4.7,
+    infoNote: "Sarasota — free waterfront park, open lawns, frequent community events, small food concession.",
+  },
+  {
+    id: "seed-98",
+    name: "Payne Park",
+    type: "city",
+    address: "2010 Adams Ln, Sarasota, FL 34237",
+    hours: "Daily, hours vary by day",
+    activities: ["Playground", "Sports Courts"],
+    rating: 4.7,
+    infoNote: "Sarasota — skatepark, disc golf course, playground themed like a circus, unpaved half-mile loop trail.",
+  },
+  {
+    id: "seed-99",
+    name: "Urfer Family Park",
+    type: "city",
+    address: "4012 Honore Ave, Sarasota, FL 34233",
+    hours: "Daily, 6:00 AM – 10:00 PM",
+    activities: ["Playground", "Hiking Trails", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "Sarasota — two playgrounds by age, short paved and hiking trails, exercise stations.",
+  },
+  {
+    id: "seed-100",
+    name: "Sapphire Shores Park",
+    type: "city",
+    address: "5015 Sun Cir, Sarasota, FL 34234",
+    hours: "Daily, 5:00 AM – 11:00 PM",
+    activities: ["Dog-Friendly", "Fishing", "Playground"],
+    rating: 4.7,
+    infoNote: "Sarasota — small waterfront park good for sunset watching and fishing; street parking only.",
+  },
+  {
+    id: "seed-101",
+    name: "Red Bug Slough Preserve",
+    type: "nature",
+    address: "5200 S Beneva Rd, Sarasota, FL 34231",
+    hours: "Daily, hours vary — check posted signage",
+    activities: ["Hiking Trails", "Dog-Friendly", "Playground"],
+    rating: 4.7,
+    infoNote: "Sarasota — 72-acre preserve, paved and unpaved trails around lakes and wetlands.",
+  },
+  {
+    id: "seed-102",
+    name: "Siesta Key Beach Playground",
+    type: "city",
+    address: "948 Beach Rd, Siesta Key, FL 34242",
+    hours: "Open 24 hours",
+    activities: ["Playground", "Water / Beach"],
+    rating: 4.7,
+    infoNote: "Sarasota — playground set back from the beach, borrow-a-toy sand basket, concession stand nearby.",
+  },
+  {
+    id: "seed-103",
+    name: "Nora Patterson Bay Island Park",
+    type: "city",
+    address: "946 Siesta Dr, Sarasota, FL 34242",
+    hours: "Daily, 5:00 AM – 11:00 PM",
+    activities: ["Dog-Friendly", "Fishing", "Water / Beach"],
+    rating: 4.6,
+    infoNote: "Sarasota — bay-side park good for boat-watching and fishing, extends under the bridge for a quieter section.",
+  },
+  {
+    id: "seed-104",
+    name: "Oscar Scherer State Park",
+    type: "state",
+    address: "1843 S Tamiami Trail, Osprey, FL 34229",
+    hours: "Daily, hours vary by season",
+    activities: ["Camping", "Hiking Trails", "Biking", "Kayaking / Boating"],
+    rating: 4.6,
+    infoNote: "Sarasota County — home to the endangered Florida scrub-jay, kayak/SUP rentals, connects to the paved Legacy Trail.",
+  },
+  {
+    id: "seed-105",
+    name: "Maxine Barritt Park",
+    type: "city",
+    address: "1800 Harbor Dr S, Venice, FL 34285",
+    hours: "Daily, 6:00 AM – 12:00 AM",
+    activities: ["Playground", "Dog-Friendly", "Water / Beach"],
+    rating: 4.8,
+    infoNote: "Venice — Gulf-view walking loop, playground, connects directly to the adjacent dog park and beach access.",
+  },
+  {
+    id: "seed-106",
+    name: "Arlington Dog Park",
+    type: "dog",
+    address: "Sarasota, FL 34239",
+    hours: "Daily, hours vary — check posted signage",
+    activities: ["Dog-Friendly"],
+    rating: 5.0,
+    infoNote: "Sarasota — enclosed off-leash area with waste stations, parking off Waldemere St.",
+  },
+  {
+    id: "seed-107",
+    name: "17th Street Paw Park",
+    type: "dog",
+    address: "4570 17th St, Sarasota, FL 34240",
+    hours: "Daily, hours vary by day",
+    activities: ["Dog-Friendly"],
+    rating: 4.6,
+    infoNote: "Sarasota — large park with small/large dog sections plus an agility course.",
+  },
+  {
+    id: "seed-108",
+    name: "Canine Club Dog Park",
+    type: "dog",
+    address: "1791 10th St, Sarasota, FL 34236",
+    hours: "Daily, 5:00 AM – 11:00 PM; closed Tuesdays for maintenance",
+    activities: ["Dog-Friendly"],
+    rating: 4.4,
+    infoNote: "Sarasota — separate large/small dog sides, near downtown, closed Tuesdays for cleaning.",
+  },
+  {
+    id: "seed-109",
+    name: "Tom Bennett Park",
+    type: "city",
+    address: "280 Kay Rd, Bradenton, FL 34208",
+    hours: "Daily, 7:00 AM – 8:00 PM",
+    activities: ["Playground", "Sports Courts", "Biking", "Hiking Trails"],
+    rating: 4.7,
+    infoNote: "Manatee County — ~200 acres, ADA-accessible playground and splash pad, disc golf, volleyball courts.",
+  },
+  {
+    id: "seed-110",
+    name: "Robinson Preserve",
+    type: "nature",
+    address: "1704 99th St NW, Bradenton, FL 34209",
+    hours: "Open 24 hours",
+    activities: ["Hiking Trails", "Biking", "Kayaking / Boating"],
+    rating: 4.8,
+    infoNote: "Manatee County — extensive trail network, kayak launch and rentals, observation tower with skyway bridge views.",
+  },
+  {
+    id: "seed-111",
+    name: "Portosueno Park",
+    type: "nature",
+    address: "1206 Alcazar Dr, Bradenton, FL 34209",
+    hours: "Daily, 6:00 AM – 8:00 PM",
+    activities: ["Water / Beach"],
+    rating: 4.7,
+    infoNote: "Manatee County — small, quiet park best known for manatee viewing (peak season March–April). Very limited parking, no restrooms.",
+  },
+  {
+    id: "seed-112",
+    name: "Robinson Preserve Expansion",
+    type: "nature",
+    address: "10299 9th Ave NW, Bradenton, FL 34209",
+    hours: "Daily, 7:30 AM – 6:00 PM (Sun until 7:30 PM)",
+    activities: ["Hiking Trails", "Kayaking / Boating"],
+    rating: 4.9,
+    infoNote: "Manatee County — rubberized running trails, fire tower with panoramic views, connects to the main Robinson Preserve.",
+  },
+  {
+    id: "seed-113",
+    name: "Riverwalk",
+    type: "city",
+    address: "452 3rd Ave W, Bradenton, FL 34205",
+    hours: "Open 24 hours",
+    activities: ["Playground", "Splash Pad", "Biking", "Sports Courts"],
+    rating: 4.7,
+    infoNote: "Manatee County — riverfront path through downtown Bradenton, splash pad, gateway to the Gulf Islands Ferry.",
+  },
+  {
+    id: "seed-114",
+    name: "Perico Preserve",
+    type: "nature",
+    address: "11700 Manatee Ave W, Bradenton, FL 34209",
+    hours: "Open 24 hours",
+    activities: ["Hiking Trails"],
+    rating: 4.7,
+    infoNote: "Manatee County — flat 1.5-mile loop trail through wetlands, connects to Robinson Preserve for longer walks.",
+  },
+  {
+    id: "seed-115",
+    name: "Laurie Crawford Dog Park",
+    type: "dog",
+    address: "2802 51st St W, Bradenton, FL 34209",
+    hours: "Open 24 hours",
+    activities: ["Dog-Friendly"],
+    rating: 4.6,
+    infoNote: "Manatee County — spacious off-leash area, can be hit-or-miss on crowd size depending on time of day.",
+  },
+  {
+    id: "seed-116",
+    name: "Creekwood Park",
+    type: "dog",
+    address: "7025 44th Ave E, Bradenton, FL 34205",
+    hours: "Daily, 6:00 AM – 10:00 PM",
+    activities: ["Dog-Friendly"],
+    rating: 4.6,
+    infoNote: "Manatee County — large separate small/big dog sections, agility equipment, kiddie pools for dogs.",
+  },
+  {
+    id: "seed-117",
+    name: "Emerson Point Preserve",
+    type: "nature",
+    address: "5801 17th St W, Palmetto, FL 34221",
+    hours: "Daily, hours vary — check posted signage",
+    activities: ["Hiking Trails", "Kayaking / Boating", "Water / Beach"],
+    rating: 4.8,
+    infoNote: "Manatee County — mangrove trails, small beach access points, historic mounds, observation tower.",
+  },
+  {
+    id: "seed-118",
+    name: "Rye Preserve",
+    type: "nature",
+    address: "905 Rye Wilderness Trail, Parrish, FL 34219",
+    hours: "Open 24 hours",
+    activities: ["Hiking Trails", "Playground", "Dog-Friendly"],
+    rating: 4.6,
+    infoNote: "Manatee County — sandy riverbank trails along the Manatee River, freshwater swimming spots, color-coded trail system.",
+  },
+  {
+    id: "seed-119",
+    name: "Neal Preserve",
+    type: "nature",
+    address: "12301 Manatee Ave W, Bradenton, FL 34209",
+    hours: "Open 24 hours",
+    activities: ["Hiking Trails"],
+    rating: 4.6,
+    infoNote: "Manatee County — short boardwalk trails over a historic Indigenous burial ground site, observation tower.",
+  },
+  {
+    id: "seed-5",
+    name: "New Tampa Nature Park",
+    type: "nature",
+    address: "17001 Dona Michelle Dr, Tampa, FL 33612",
+    hours: "Daily, 7:00 AM – 8:00 PM",
+    activities: ["Hiking Trails", "Biking", "Playground"],
+    rating: 4.6,
+    infoNote: "Connects to Flatwoods trail system. Limited parking.",
+  },
+  {
+    id: "seed-6",
+    name: "Hillsborough River State Park",
+    type: "state",
+    address: "15402 US-301, Thonotosassa, FL 33592",
+    hours: "Daily, 8:00 AM – 5:30 PM",
+    activities: ["Hiking Trails", "Kayaking / Boating", "Camping", "Picnic Area"],
+    rating: 4.6,
+    infoNote: "$6 vehicle entry fee. Some trails closed after storms — check ahead.",
+  },
+  {
+    id: "seed-7",
+    name: "Anclote Key Preserve State Park",
+    type: "state",
+    address: "Tarpon Springs, FL 34689",
+    hours: "Varies — boat/ferry access only",
+    activities: ["Water / Beach", "Fishing", "Kayaking / Boating"],
+    rating: 4.8,
+    infoNote: "Barrier island, no vehicle access. Ferry from Tarpon Springs.",
+  },
+  {
+    id: "seed-8",
+    name: "Caladesi Island State Park",
+    type: "state",
+    address: "1 Causeway Blvd, Dunedin, FL 34698",
+    hours: "Varies — ferry from Honeymoon Island",
+    activities: ["Water / Beach", "Kayaking / Boating", "Picnic Area"],
+    rating: 4.8,
+    infoNote: "~$20/person ferry ride. Café on the island.",
+  },
+  {
+    id: "seed-9",
+    name: "Alafia River State Park",
+    type: "state",
+    address: "14326 S County Rd 39, Lithia, FL 33547",
+    hours: "Varies by season",
+    activities: ["Hiking Trails", "Biking", "Camping"],
+    rating: 4.8,
+    infoNote: "Known for serious mountain biking terrain — hilly for FL.",
+  },
+  {
+    id: "seed-10",
+    name: "Rainbow Springs State Park",
+    type: "state",
+    address: "19158 SW 81st Pl Rd, Dunnellon, FL 34432",
+    hours: "Daily, 8:00 AM – 6:45 PM",
+    activities: ["Kayaking / Boating", "Water / Beach", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "$2 entry to headsprings. Kayak/tube rentals on site.",
+  },
+  {
+    id: "seed-11",
+    name: "Honeymoon Island State Park",
+    type: "state",
+    address: "1 Causeway Blvd, Dunedin, FL 34698",
+    hours: "Varies by season",
+    activities: ["Water / Beach", "Dog-Friendly", "Hiking Trails"],
+    rating: 4.7,
+    infoNote: "Has a dedicated dog beach area. ~$8 parking per vehicle.",
+  },
+  {
+    id: "seed-12",
+    name: "Dog Park at Al Lopez Park",
+    type: "dog",
+    address: "4810 N Himes Ave, Tampa, FL 33614",
+    hours: "Open 24 hours",
+    activities: ["Dog-Friendly"],
+    rating: 4.7,
+    infoNote: "Large fenced area, shaded, water fountains for dogs.",
+  },
+  {
+    id: "seed-13",
+    name: "Dog Parks at Julian B. Lane Riverfront Park",
+    type: "dog",
+    address: "1001 N Blvd, Tampa, FL 33606",
+    hours: "Daily, 7:00 AM – 10:00 PM",
+    activities: ["Dog-Friendly"],
+    rating: 4.7,
+    infoNote: "Separate large- and small-dog turf areas.",
+  },
+  {
+    id: "seed-14",
+    name: "Queenie's Dog Park",
+    type: "dog",
+    address: "1710 N Highland Ave, Tampa, FL 33602",
+    hours: "Daily, 7:00 AM – 10:00 PM",
+    activities: ["Dog-Friendly"],
+    rating: 4.6,
+    infoNote: "On the Riverwalk, near the splash pad.",
+  },
+  {
+    id: "seed-15",
+    name: "Deputy Kotfila Memorial Dog Park",
+    type: "dog",
+    address: "626 N Raymond Ave, Tampa, FL 33602",
+    hours: "Daily, 5:00 AM – 11:00 PM",
+    activities: ["Dog-Friendly"],
+    rating: 4.6,
+    infoNote: "All-turf, shaded under a bridge overpass.",
+  },
+  {
+    id: "seed-16",
+    name: "Wilderness Conservation Park (Morris Bridge Site)",
+    type: "nature",
+    address: "13630 Morris Bridge Rd, Thonotosassa, FL 33592",
+    hours: "Daily, 7:00 AM – 6:00 PM",
+    activities: ["Hiking Trails", "Fishing", "Kayaking / Boating"],
+    rating: 4.7,
+    infoNote: "$2 parking. Boardwalk along the river, watch for gators.",
+  },
+  {
+    id: "seed-17",
+    name: "Lower Hillsborough Wildlife Management Area",
+    type: "nature",
+    address: "15846 Morris Bridge Rd, Thonotosassa, FL 33592",
+    hours: "Daily, 8:00 AM – 7:30 PM",
+    activities: ["Hiking Trails", "Kayaking / Boating", "Playground", "Picnic Area"],
+    rating: 4.6,
+    infoNote: "Well-marked trails, boat launch, good for all skill levels.",
+  },
+  {
+    id: "seed-18",
+    name: "Eureka Springs Park",
+    type: "nature",
+    address: "6400 Eureka Springs Rd, Tampa, FL 33610",
+    hours: "Daily, 8:00 AM – 6:00 PM",
+    activities: ["Hiking Trails", "Picnic Area"],
+    rating: 4.7,
+    infoNote: "$2 entry. Boardwalk, greenhouse, botanical garden feel.",
+  },
+];
+
+const emptyVisit = () => ({
+  visited: false,
+  dateVisited: null,
+  favorite: false,
+  notes: "",
+});
+
+function getParkCoords(park) {
+  const seeded = PARK_COORDS[park.id];
+  if (seeded) return { lat: seeded[0], lng: seeded[1] };
+  if (typeof park.latitude === "number" && typeof park.longitude === "number") {
+    return { lat: park.latitude, lng: park.longitude };
+  }
+  return null;
+}
+
+function milesBetween(lat1, lng1, lat2, lng2) {
+  const R = 3958.8; // Earth radius in miles
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+// ---------------------------------------------------------------------------
+// Storage helpers
+// ---------------------------------------------------------------------------
+
+async function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      return JSON.parse(raw);
+    }
+  } catch (e) {
+    // corrupted or missing — fall through to seed
+  }
+  const seeded = {
+    parks: SEED_PARKS,
+    visits: Object.fromEntries(SEED_PARKS.map((p) => [p.id, emptyVisit()])),
+  };
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(seeded));
+  } catch (e) {
+    console.error("Failed to seed storage", e);
+  }
+  return seeded;
+}
+
+async function saveData(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.error("Failed to save storage", e);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Small UI pieces
+// ---------------------------------------------------------------------------
+
+function TypeBadge({ type }) {
+  const meta = TYPE_META[type] || TYPE_META.city;
+  const Icon = meta.icon;
+  return (
+    <span
+      className="type-badge"
+      style={{ color: meta.color, borderColor: meta.color }}
+    >
+      <Icon size={13} strokeWidth={2.25} />
+      {meta.label}
+    </span>
+  );
+}
+
+function VisitedStamp({ date }) {
+  return (
+    <div className="stamp">
+      <div className="stamp-ring">
+        <span>VISITED</span>
+        <span className="stamp-date">{date}</span>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Add Park Form
+// ---------------------------------------------------------------------------
+
+function AddParkForm({ onAdd, onCancel }) {
+  const [name, setName] = useState("");
+  const [type, setType] = useState("city");
+  const [address, setAddress] = useState("");
+  const [hours, setHours] = useState("");
+  const [infoNote, setInfoNote] = useState("");
+  const [activities, setActivities] = useState([]);
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [website, setWebsite] = useState("");
+
+  const toggleActivity = (a) => {
+    setActivities((prev) =>
+      prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]
+    );
+  };
+
+  const submit = () => {
+    if (!name.trim()) return;
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+    onAdd({
+      id: `custom-${Date.now()}`,
+      name: name.trim(),
+      type,
+      address: address.trim(),
+      hours: hours.trim() || "Hours not set",
+      activities,
+      rating: null,
+      infoNote: infoNote.trim(),
+      ...(Number.isFinite(lat) && Number.isFinite(lng) ? { latitude: lat, longitude: lng } : {}),
+      ...(website.trim() ? { website: website.trim() } : {}),
+    });
+  };
+
+  return (
+    <div className="add-form-backdrop" onClick={onCancel}>
+      <div className="add-form" onClick={(e) => e.stopPropagation()}>
+        <div className="add-form-header">
+          <h3>Add a Park</h3>
+          <button className="icon-btn" onClick={onCancel} aria-label="Close">
+            <X size={18} />
+          </button>
+        </div>
+
+        <label className="field-label">Name</label>
+        <input
+          className="field-input"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g. Lettuce Lake Park"
+        />
+
+        <label className="field-label">Type</label>
+        <select
+          className="field-input"
+          value={type}
+          onChange={(e) => setType(e.target.value)}
+        >
+          {Object.entries(TYPE_META).map(([key, meta]) => (
+            <option key={key} value={key}>
+              {meta.label}
+            </option>
+          ))}
+        </select>
+
+        <label className="field-label">Address</label>
+        <input
+          className="field-input"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
+          placeholder="Street, City, State"
+        />
+
+        <label className="field-label">Hours</label>
+        <input
+          className="field-input"
+          value={hours}
+          onChange={(e) => setHours(e.target.value)}
+          placeholder="e.g. Daily, 7:00 AM – 7:00 PM"
+        />
+
+        <label className="field-label">Activities</label>
+        <div className="chip-row">
+          {ACTIVITY_OPTIONS.map((a) => (
+            <button
+              key={a}
+              type="button"
+              className={`chip ${activities.includes(a) ? "chip-active" : ""}`}
+              onClick={() => toggleActivity(a)}
+            >
+              {a}
+            </button>
+          ))}
+        </div>
+
+        <label className="field-label">Notes (fees, access, tips)</label>
+        <textarea
+          className="field-input"
+          rows={2}
+          value={infoNote}
+          onChange={(e) => setInfoNote(e.target.value)}
+          placeholder="Optional"
+        />
+
+        <label className="field-label">Coordinates (optional — enables distance sorting)</label>
+        <div className="coord-row">
+          <input
+            className="field-input"
+            value={latitude}
+            onChange={(e) => setLatitude(e.target.value)}
+            placeholder="Latitude"
+            inputMode="decimal"
+          />
+          <input
+            className="field-input"
+            value={longitude}
+            onChange={(e) => setLongitude(e.target.value)}
+            placeholder="Longitude"
+            inputMode="decimal"
+          />
+        </div>
+
+        <label className="field-label">Official website (optional)</label>
+        <input
+          className="field-input"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+          placeholder="https://..."
+        />
+
+        <button className="primary-btn" onClick={submit}>
+          <Plus size={16} /> Add Park
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Park Card
+// ---------------------------------------------------------------------------
+
+function ParkCard({ park, visit, distance, onToggleVisited, onToggleFavorite, onNotesChange, onDelete }) {
+  const [expanded, setExpanded] = useState(false);
+  const [localNotes, setLocalNotes] = useState(visit.notes || "");
+
+  useEffect(() => {
+    setLocalNotes(visit.notes || "");
+  }, [visit.notes]);
+
+  return (
+    <div className={`park-card ${visit.visited ? "park-card-visited" : ""}`}>
+      {visit.visited && <VisitedStamp date={visit.dateVisited} />}
+
+      <div className="park-card-top">
+        <TypeBadge type={park.type} />
+        <button
+          className={`heart-btn ${visit.favorite ? "heart-active" : ""}`}
+          onClick={onToggleFavorite}
+          aria-label="Favorite"
+        >
+          <Heart size={17} fill={visit.favorite ? "#C1541C" : "none"} />
+        </button>
+      </div>
+
+      <h3 className="park-name">{park.name}</h3>
+
+      <div className="park-meta-row">
+        <MapPin size={13} />
+        <span>{park.address}</span>
+      </div>
+      {distance != null && (
+        <div className="park-meta-row distance-row">
+          <Compass size={13} />
+          <span>{distance < 0.1 ? "Right nearby" : `${distance.toFixed(1)} mi away`}</span>
+        </div>
+      )}
+      <div className="park-meta-row">
+        <Clock size={13} />
+        <span>{park.hours}</span>
+      </div>
+      {getParkWebsite(park) && (
+        <a
+          className="website-link"
+          href={getParkWebsite(park)}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <ExternalLink size={12} /> Official website
+        </a>
+      )}
+
+      {park.activities && park.activities.length > 0 && (
+        <div className="activity-tags">
+          {park.activities.map((a) => (
+            <span key={a} className="activity-tag">
+              {a}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {park.rating && (
+        <div className="rating-row">
+          <Star size={13} fill="#C1541C" color="#C1541C" />
+          <span>{park.rating.toFixed(1)}</span>
+        </div>
+      )}
+
+      <div className="card-actions">
+        <button
+          className={`visit-btn ${visit.visited ? "visit-btn-active" : ""}`}
+          onClick={onToggleVisited}
+        >
+          {visit.visited ? <Check size={15} /> : <Compass size={15} />}
+          {visit.visited ? "Visited" : "Mark Visited"}
+        </button>
+        <button className="text-btn" onClick={() => setExpanded((e) => !e)}>
+          Notes {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        </button>
+        <button className="icon-btn danger" onClick={onDelete} aria-label="Remove">
+          <Trash2 size={15} />
+        </button>
+      </div>
+
+      {expanded && (
+        <div className="notes-panel">
+          {park.infoNote && <p className="info-note">{park.infoNote}</p>}
+          <textarea
+            className="field-input"
+            rows={2}
+            placeholder="Your notes — what you did, what to bring next time..."
+            value={localNotes}
+            onChange={(e) => setLocalNotes(e.target.value)}
+            onBlur={() => onNotesChange(localNotes)}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Leaflet loader (loads OpenStreetMap-based Leaflet from a CDN once)
+// ---------------------------------------------------------------------------
+
+function useLeafletLoader() {
+  const [ready, setReady] = useState(!!(typeof window !== "undefined" && window.L));
+
+  useEffect(() => {
+    if (typeof window === "undefined" || window.L) {
+      setReady(true);
+      return;
+    }
+    const existing = document.getElementById("leaflet-js-lib");
+    if (existing) {
+      if (window.L) {
+        setReady(true);
+      } else {
+        existing.addEventListener("load", () => setReady(true));
+      }
+      return;
+    }
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css";
+    document.head.appendChild(link);
+
+    const script = document.createElement("script");
+    script.id = "leaflet-js-lib";
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js";
+    script.async = true;
+    script.onload = () => setReady(true);
+    document.head.appendChild(script);
+  }, []);
+
+  return ready;
+}
+
+// ---------------------------------------------------------------------------
+// Park Map — real interactive, pannable/zoomable map (OpenStreetMap tiles)
+// ---------------------------------------------------------------------------
+
+function ParkMap({
+  parks,
+  userCoords,
+  locationStatus,
+  selectedParkId,
+  onSelectPark,
+  visits,
+  onToggleVisited,
+  onToggleFavorite,
+  onNotesChange,
+  onDelete,
+}) {
+  const leafletReady = useLeafletLoader();
+  const containerRef = useRef(null);
+  const mapRef = useRef(null);
+  const layerRef = useRef(null);
+  const hasFitBoundsRef = useRef(false);
+
+  const withCoords = useMemo(
+    () =>
+      parks
+        .map((p) => ({ ...p, _coords: getParkCoords(p) }))
+        .filter((p) => p._coords),
+    [parks]
+  );
+
+  // Initialize the map once Leaflet is loaded and the container exists.
+  useEffect(() => {
+    if (!leafletReady || !containerRef.current || mapRef.current) return;
+    const L = window.L;
+    const map = L.map(containerRef.current, {
+      zoomControl: true,
+      scrollWheelZoom: true,
+    }).setView([27.95, -82.46], 10);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors",
+      maxZoom: 19,
+    }).addTo(map);
+
+    layerRef.current = L.layerGroup().addTo(map);
+    mapRef.current = map;
+
+    // Leaflet needs a nudge to size correctly inside a flex/grid layout.
+    setTimeout(() => map.invalidateSize(), 50);
+  }, [leafletReady]);
+
+  // Keep markers in sync with filtered parks / user location / selection.
+  useEffect(() => {
+    if (!mapRef.current || !window.L) return;
+    const L = window.L;
+    const layer = layerRef.current;
+    layer.clearLayers();
+
+    const bounds = [];
+
+    withCoords.forEach((p) => {
+      const meta = TYPE_META[p.type] || TYPE_META.city;
+      const isSelected = p.id === selectedParkId;
+      const marker = L.circleMarker([p._coords.lat, p._coords.lng], {
+        radius: isSelected ? 10 : 7,
+        color: "#ffffff",
+        weight: 1.5,
+        fillColor: meta.color,
+        fillOpacity: 0.9,
+      });
+      marker.bindTooltip(p.name, { direction: "top", offset: [0, -6] });
+      marker.on("click", () => onSelectPark(p.id));
+      marker.addTo(layer);
+      bounds.push([p._coords.lat, p._coords.lng]);
+    });
+
+    if (userCoords) {
+      const youMarker = L.circleMarker([userCoords.lat, userCoords.lng], {
+        radius: 9,
+        color: "#ffffff",
+        weight: 2,
+        fillColor: "#C1541C",
+        fillOpacity: 1,
+      });
+      youMarker.bindTooltip("You", { direction: "top", offset: [0, -6] });
+      youMarker.addTo(layer);
+      bounds.push([userCoords.lat, userCoords.lng]);
+    }
+
+    if (bounds.length > 0 && !hasFitBoundsRef.current) {
+      mapRef.current.fitBounds(bounds, { padding: [30, 30], maxZoom: 13 });
+      hasFitBoundsRef.current = true;
+    }
+  }, [withCoords, userCoords, selectedParkId, onSelectPark, leafletReady]);
+
+  const selectedPark = withCoords.find((p) => p.id === selectedParkId) || null;
+  const selectedVisit = selectedPark ? visits[selectedPark.id] || emptyVisit() : null;
+
+  if (withCoords.length === 0) {
+    return (
+      <div className="map-empty-state">
+        <MapIcon size={30} />
+        <p>No parks with coordinates match your filters yet.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="map-wrap">
+      {locationStatus !== "granted" && (
+        <div className="location-banner">
+          Your position isn't shown on the map because location access isn't available. Parks are still plotted at their real locations.
+        </div>
+      )}
+      <div className="map-canvas-outer">
+        {!leafletReady && (
+          <div className="map-loading">
+            <MapIcon size={22} className="spin" />
+            <span>Loading map…</span>
+          </div>
+        )}
+        <div ref={containerRef} className="leaflet-map-el" />
+      </div>
+
+      <div className="map-legend">
+        {Object.entries(TYPE_META).map(([key, meta]) => (
+          <span key={key} className="map-legend-item">
+            <span className="map-legend-dot" style={{ background: meta.color }} />
+            {meta.label}
+          </span>
+        ))}
+        {userCoords && (
+          <span className="map-legend-item">
+            <span className="map-legend-dot" style={{ background: "#C1541C" }} />
+            You
+          </span>
+        )}
+      </div>
+
+      {selectedPark ? (
+        <div className="map-detail-card">
+          <ParkCard
+            park={selectedPark}
+            visit={selectedVisit}
+            distance={selectedPark._distance}
+            onToggleVisited={() => onToggleVisited(selectedPark.id)}
+            onToggleFavorite={() => onToggleFavorite(selectedPark.id)}
+            onNotesChange={(notes) => onNotesChange(selectedPark.id, notes)}
+            onDelete={() => onDelete(selectedPark.id)}
+          />
+        </div>
+      ) : (
+        <p className="map-hint">Tap a pin to see details. Pinch or scroll to zoom, drag to pan.</p>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Main App
+// ---------------------------------------------------------------------------
+
+export default function ParkExplorer() {
+  const [loading, setLoading] = useState(true);
+  const [parks, setParks] = useState([]);
+  const [visits, setVisits] = useState({});
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [activityFilter, setActivityFilter] = useState([]);
+  const [search, setSearch] = useState("");
+  const [unvisitedOnly, setUnvisitedOnly] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [syncMessage, setSyncMessage] = useState(null);
+  const [userCoords, setUserCoords] = useState(null);
+  const [locationStatus, setLocationStatus] = useState("loading"); // loading | granted | denied | unavailable
+  const [activeView, setActiveView] = useState("list"); // list | map
+  const [selectedParkId, setSelectedParkId] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
+
+  useEffect(() => {
+    if (!("geolocation" in navigator)) {
+      setLocationStatus("unavailable");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocationStatus("granted");
+      },
+      () => {
+        setLocationStatus("denied");
+      },
+      { enableHighAccuracy: false, timeout: 8000, maximumAge: 10 * 60 * 1000 }
+    );
+  }, []);
+
+  useEffect(() => {
+    loadData().then((data) => {
+      setParks(data.parks);
+      setVisits(data.visits);
+      setLoading(false);
+    });
+  }, []);
+
+  const persist = useCallback((nextParks, nextVisits) => {
+    saveData({ parks: nextParks, visits: nextVisits });
+  }, []);
+
+  const updateVisit = (id, patch) => {
+    setVisits((prev) => {
+      const next = { ...prev, [id]: { ...(prev[id] || emptyVisit()), ...patch } };
+      persist(parks, next);
+      return next;
+    });
+  };
+
+  const toggleVisited = (id) => {
+    const current = visits[id] || emptyVisit();
+    updateVisit(id, {
+      visited: !current.visited,
+      dateVisited: !current.visited
+        ? new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+        : null,
+    });
+  };
+
+  const toggleFavorite = (id) => {
+    const current = visits[id] || emptyVisit();
+    updateVisit(id, { favorite: !current.favorite });
+  };
+
+  const setNotes = (id, notes) => {
+    updateVisit(id, { notes });
+  };
+
+  const addPark = (newPark) => {
+    setParks((prev) => {
+      const next = [newPark, ...prev];
+      const nextVisits = { ...visits, [newPark.id]: emptyVisit() };
+      setVisits(nextVisits);
+      persist(next, nextVisits);
+      return next;
+    });
+    setShowAddForm(false);
+  };
+
+  const deletePark = (id) => {
+    setParks((prev) => {
+      const next = prev.filter((p) => p.id !== id);
+      const nextVisits = { ...visits };
+      delete nextVisits[id];
+      setVisits(nextVisits);
+      persist(next, nextVisits);
+      return next;
+    });
+  };
+
+  const syncNewSeedParks = () => {
+    setParks((prevParks) => {
+      const existingIds = new Set(prevParks.map((p) => p.id));
+      const missing = SEED_PARKS.filter((p) => !existingIds.has(p.id));
+      if (missing.length === 0) {
+        setSyncMessage("You're all caught up — no new parks to add.");
+        setTimeout(() => setSyncMessage(null), 3500);
+        return prevParks;
+      }
+      const nextParks = [...missing, ...prevParks];
+      setVisits((prevVisits) => {
+        const nextVisits = { ...prevVisits };
+        missing.forEach((p) => {
+          nextVisits[p.id] = emptyVisit();
+        });
+        persist(nextParks, nextVisits);
+        return nextVisits;
+      });
+      setSyncMessage(
+        `Added ${missing.length} new park${missing.length === 1 ? "" : "s"}: ${missing
+          .map((p) => p.name)
+          .join(", ")}`
+      );
+      setTimeout(() => setSyncMessage(null), 5000);
+      return nextParks;
+    });
+  };
+
+  const toggleActivityFilter = (a) => {
+    setActivityFilter((prev) =>
+      prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a]
+    );
+  };
+
+  const activeFilterCount =
+    (typeFilter !== "all" ? 1 : 0) + activityFilter.length + (unvisitedOnly ? 1 : 0);
+
+  const filteredParks = useMemo(() => {
+    const withDistance = parks.map((p) => {
+      const coords = getParkCoords(p);
+      const distance =
+        userCoords && coords
+          ? milesBetween(userCoords.lat, userCoords.lng, coords.lat, coords.lng)
+          : null;
+      return { ...p, _distance: distance };
+    });
+
+    const filtered = withDistance.filter((p) => {
+      if (typeFilter !== "all" && p.type !== typeFilter) return false;
+      if (
+        activityFilter.length > 0 &&
+        !activityFilter.every((a) => (p.activities || []).includes(a))
+      )
+        return false;
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        if (
+          !p.name.toLowerCase().includes(q) &&
+          !p.address.toLowerCase().includes(q)
+        )
+          return false;
+      }
+      const visit = visits[p.id] || emptyVisit();
+      if (unvisitedOnly && visit.visited) return false;
+      return true;
+    });
+
+    filtered.sort((a, b) => {
+      if (a._distance == null && b._distance == null) return a.name.localeCompare(b.name);
+      if (a._distance == null) return 1;
+      if (b._distance == null) return -1;
+      return a._distance - b._distance;
+    });
+
+    return filtered;
+  }, [parks, typeFilter, activityFilter, search, unvisitedOnly, visits, userCoords]);
+
+  const stats = useMemo(() => {
+    const total = parks.length;
+    const visitedCount = Object.values(visits).filter((v) => v.visited).length;
+    const favCount = Object.values(visits).filter((v) => v.favorite).length;
+    return { total, visitedCount, favCount };
+  }, [parks, visits]);
+
+  if (loading) {
+    return (
+      <div className="loading-screen">
+        <Compass size={28} className="spin" />
+        <span>Loading your parks…</span>
+        <StyleBlock />
+      </div>
+    );
+  }
+
+  return (
+    <div className="app-root">
+      <StyleBlock />
+
+      <header className="app-header">
+        <div className="header-contour" aria-hidden="true">
+          <svg viewBox="0 0 400 60" preserveAspectRatio="none">
+            <path d="M0,40 Q50,10 100,35 T200,30 T300,45 T400,20" />
+            <path d="M0,52 Q60,25 120,48 T240,42 T400,50" />
+          </svg>
+        </div>
+        <div className="header-content">
+          <h1>
+            <Compass size={26} strokeWidth={2} />
+            Get Outside
+          </h1>
+        </div>
+        <div className="stats-row">
+          <div className="stat">
+            <strong>{stats.total}</strong>
+            <span>Parks</span>
+          </div>
+          <div className="stat">
+            <strong>{stats.visitedCount}</strong>
+            <span>Visited</span>
+          </div>
+          <div className="stat">
+            <strong>{stats.favCount}</strong>
+            <span>Favorites</span>
+          </div>
+        </div>
+      </header>
+
+      <div className="controls">
+        {locationStatus === "denied" && (
+          <div className="location-banner">
+            Location access was denied, so parks are sorted alphabetically instead of by distance. You can enable location for this page in your browser settings to sort by closest.
+          </div>
+        )}
+        {locationStatus === "unavailable" && (
+          <div className="location-banner">
+            This browser doesn't support location — parks are sorted alphabetically instead of by distance.
+          </div>
+        )}
+        <div className="search-row">
+          <Search size={16} />
+          <input
+            className="search-input"
+            placeholder="Search parks or areas..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        <div className="filters-toggle-row">
+          <button
+            className={`filters-toggle-btn ${showFilters ? "filters-toggle-active" : ""}`}
+            onClick={() => setShowFilters((s) => !s)}
+          >
+            <SlidersHorizontal size={14} />
+            Filters
+            {activeFilterCount > 0 && <span className="filter-count-badge">{activeFilterCount}</span>}
+            {showFilters ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          </button>
+          <div className="toggle-row-btns">
+            <button className="secondary-btn small" onClick={syncNewSeedParks}>
+              <RefreshCw size={14} /> Sync new parks
+            </button>
+            <button className="primary-btn small" onClick={() => setShowAddForm(true)}>
+              <Plus size={15} /> Add Park
+            </button>
+          </div>
+        </div>
+
+        {showFilters && (
+          <div className="filters-panel">
+            <div className="type-tabs">
+              <button
+                className={`type-tab ${typeFilter === "all" ? "type-tab-active" : ""}`}
+                onClick={() => setTypeFilter("all")}
+              >
+                All
+              </button>
+              {Object.entries(TYPE_META).map(([key, meta]) => (
+                <button
+                  key={key}
+                  className={`type-tab ${typeFilter === key ? "type-tab-active" : ""}`}
+                  onClick={() => setTypeFilter(key)}
+                  style={typeFilter === key ? { borderColor: meta.color, color: meta.color } : {}}
+                >
+                  {meta.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="chip-row">
+              {ACTIVITY_OPTIONS.map((a) => (
+                <button
+                  key={a}
+                  className={`chip ${activityFilter.includes(a) ? "chip-active" : ""}`}
+                  onClick={() => toggleActivityFilter(a)}
+                >
+                  {a}
+                </button>
+              ))}
+            </div>
+
+            <label className="toggle-label">
+              <input
+                type="checkbox"
+                checked={unvisitedOnly}
+                onChange={(e) => setUnvisitedOnly(e.target.checked)}
+              />
+              Show unvisited only
+            </label>
+          </div>
+        )}
+
+        {syncMessage && <div className="sync-banner">{syncMessage}</div>}
+
+        <div className="view-tabs">
+          <button
+            className={`view-tab ${activeView === "list" ? "view-tab-active" : ""}`}
+            onClick={() => setActiveView("list")}
+          >
+            <List size={14} /> List
+          </button>
+          <button
+            className={`view-tab ${activeView === "map" ? "view-tab-active" : ""}`}
+            onClick={() => setActiveView("map")}
+          >
+            <MapIcon size={14} /> Map
+          </button>
+        </div>
+      </div>
+
+      {activeView === "map" ? (
+        <ParkMap
+          parks={filteredParks}
+          userCoords={userCoords}
+          locationStatus={locationStatus}
+          selectedParkId={selectedParkId}
+          onSelectPark={setSelectedParkId}
+          visits={visits}
+          onToggleVisited={toggleVisited}
+          onToggleFavorite={toggleFavorite}
+          onNotesChange={setNotes}
+          onDelete={deletePark}
+        />
+      ) : (
+        <main className="park-grid">
+          {filteredParks.length === 0 && (
+            <div className="empty-state">
+              <TreePine size={30} />
+              <p>No parks match those filters yet. Try widening your search, or add one.</p>
+            </div>
+          )}
+          {filteredParks.map((park) => (
+            <ParkCard
+              key={park.id}
+              park={park}
+              visit={visits[park.id] || emptyVisit()}
+              distance={park._distance}
+              onToggleVisited={() => toggleVisited(park.id)}
+              onToggleFavorite={() => toggleFavorite(park.id)}
+              onNotesChange={(notes) => setNotes(park.id, notes)}
+              onDelete={() => deletePark(park.id)}
+            />
+          ))}
+        </main>
+      )}
+
+      {showAddForm && (
+        <AddParkForm onAdd={addPark} onCancel={() => setShowAddForm(false)} />
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Styles
+// ---------------------------------------------------------------------------
+
+function StyleBlock() {
+  return (
+    <style>{`
+      @import url('https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+      :root {
+        --canopy: #1F3D2B;
+        --canopy-light: #4B7A3E;
+        --teal: #2F6F62;
+        --blaze: #C1541C;
+        --paper: #F2EEE1;
+        --paper-line: #E4DEC9;
+        --ink: #1B1F1A;
+      }
+
+      * { box-sizing: border-box; }
+
+      .app-root {
+        font-family: 'Public Sans', sans-serif;
+        background: var(--paper);
+        color: var(--ink);
+        min-height: 100vh;
+        padding-bottom: 40px;
+      }
+
+      .loading-screen {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        height: 100vh; gap: 10px; background: var(--paper); color: var(--canopy);
+        font-family: 'Public Sans', sans-serif;
+      }
+      .spin { animation: spin 1.4s linear infinite; }
+      @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+      .app-header {
+        position: relative;
+        background: var(--canopy);
+        color: var(--paper);
+        padding: 28px 20px 20px;
+        overflow: hidden;
+      }
+      .header-contour {
+        position: absolute; inset: 0; opacity: 0.18; pointer-events: none;
+      }
+      .header-contour svg { width: 100%; height: 100%; }
+      .header-contour path {
+        fill: none; stroke: var(--paper); stroke-width: 1.5;
+      }
+      .header-content { position: relative; z-index: 1; }
+      .app-header h1 {
+        font-family: 'Zilla Slab', serif;
+        font-weight: 700;
+        font-size: 26px;
+        display: flex; align-items: center; gap: 10px;
+        margin: 0;
+        letter-spacing: 0.3px;
+      }
+      .header-sub {
+        margin: 4px 0 0;
+        font-size: 13px;
+        color: #D7E0D2;
+        font-style: italic;
+      }
+      .stats-row {
+        position: relative; z-index: 1;
+        display: flex; gap: 22px;
+        margin-top: 18px;
+      }
+      .stat { display: flex; flex-direction: column; }
+      .stat strong { font-family: 'Zilla Slab', serif; font-size: 22px; line-height: 1; }
+      .stat span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: #C8D4C2; margin-top: 3px; }
+
+      .controls {
+        padding: 16px 20px 8px;
+        border-bottom: 1px solid var(--paper-line);
+      }
+      .search-row {
+        display: flex; align-items: center; gap: 8px;
+        background: white; border: 1px solid var(--paper-line);
+        border-radius: 8px; padding: 9px 12px; color: var(--canopy);
+        margin-bottom: 12px;
+      }
+      .search-input {
+        border: none; outline: none; flex: 1; font-size: 14px; font-family: 'Public Sans', sans-serif;
+        background: transparent; color: var(--ink);
+      }
+
+      .type-tabs {
+        display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
+      }
+      .type-tab {
+        font-family: 'Public Sans', sans-serif;
+        font-size: 12.5px; font-weight: 600;
+        border: 1.5px solid var(--paper-line);
+        background: white; color: #6b6b5f;
+        border-radius: 999px; padding: 6px 13px;
+        cursor: pointer; transition: all 0.15s;
+      }
+      .type-tab-active { background: white; }
+      .type-tab:hover { border-color: var(--canopy-light); }
+
+      .chip-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+      .chip {
+        font-size: 12px; font-family: 'Public Sans', sans-serif;
+        border: 1px solid var(--paper-line); background: white;
+        color: #6b6b5f; border-radius: 999px; padding: 5px 11px; cursor: pointer;
+      }
+      .chip-active {
+        background: var(--teal); color: white; border-color: var(--teal);
+      }
+
+      .toggle-row {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
+      }
+      .toggle-label {
+        display: flex; align-items: center; gap: 6px; font-size: 13px; color: #4a4a40;
+      }
+
+      .filters-toggle-row {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 10px; flex-wrap: wrap; gap: 10px;
+      }
+      .filters-toggle-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        font-family: 'Public Sans', sans-serif; font-size: 13px; font-weight: 600;
+        color: var(--canopy); background: white; border: 1.3px solid var(--paper-line);
+        border-radius: 8px; padding: 8px 13px; cursor: pointer;
+      }
+      .filters-toggle-btn:hover { border-color: var(--canopy-light); }
+      .filters-toggle-active { border-color: var(--canopy-light); background: #EAF2EE; }
+      .filter-count-badge {
+        background: var(--blaze); color: white; font-size: 11px; font-weight: 700;
+        border-radius: 999px; min-width: 18px; height: 18px; display: inline-flex;
+        align-items: center; justify-content: center; padding: 0 5px;
+      }
+
+      .filters-panel {
+        border: 1px solid var(--paper-line); border-radius: 10px;
+        padding: 12px 12px 14px; margin-bottom: 12px; background: #FBFAF4;
+      }
+      .filters-panel .type-tabs { margin-top: 0; }
+      .filters-panel .toggle-label { margin-top: 4px; }
+
+      .primary-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: var(--blaze); color: white; border: none;
+        border-radius: 8px; padding: 10px 16px; font-size: 13.5px; font-weight: 600;
+        cursor: pointer; font-family: 'Public Sans', sans-serif;
+      }
+      .primary-btn.small { padding: 8px 13px; font-size: 12.5px; }
+      .primary-btn:hover { filter: brightness(1.08); }
+
+      .toggle-row-btns { display: flex; gap: 8px; }
+      .secondary-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: white; color: var(--canopy); border: 1.3px solid var(--canopy-light);
+        border-radius: 8px; padding: 8px 13px; font-size: 12.5px; font-weight: 600;
+        cursor: pointer; font-family: 'Public Sans', sans-serif;
+      }
+      .secondary-btn:hover { background: #EAF2EE; }
+
+      .sync-banner {
+        margin-top: 4px; margin-bottom: 10px;
+        background: #EAF2EE; color: var(--teal);
+        border: 1px solid var(--canopy-light);
+        border-radius: 8px; padding: 8px 12px;
+        font-size: 12.5px; font-weight: 500;
+      }
+
+      .park-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 16px;
+        padding: 18px 20px;
+      }
+
+      .empty-state {
+        grid-column: 1 / -1;
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        color: var(--canopy-light); padding: 40px 20px; text-align: center;
+      }
+
+      .park-card {
+        position: relative;
+        background: white;
+        border: 1px solid var(--paper-line);
+        border-radius: 12px;
+        padding: 16px;
+        overflow: hidden;
+      }
+      .park-card-visited { border-color: var(--canopy-light); }
+
+      .stamp {
+        position: absolute; top: 10px; right: 10px; z-index: 2;
+        transform: rotate(-9deg);
+      }
+      .stamp-ring {
+        border: 2px dashed var(--blaze);
+        border-radius: 8px;
+        padding: 3px 8px;
+        display: flex; flex-direction: column; align-items: center;
+        color: var(--blaze);
+        font-family: 'JetBrains Mono', monospace;
+        opacity: 0.85;
+      }
+      .stamp-ring span { font-size: 9.5px; font-weight: 700; letter-spacing: 0.8px; }
+      .stamp-date { font-size: 8.5px !important; font-weight: 500 !important; }
+
+      .park-card-top {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 8px;
+      }
+      .type-badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 11px; font-weight: 600;
+        border: 1.3px solid; border-radius: 999px; padding: 3px 9px;
+      }
+      .heart-btn {
+        background: none; border: none; cursor: pointer; color: #999;
+        display: flex; padding: 2px;
+      }
+      .heart-active { color: var(--blaze); }
+
+      .park-name {
+        font-family: 'Zilla Slab', serif; font-size: 18px; font-weight: 700;
+        margin: 2px 0 8px; color: var(--canopy); padding-right: 60px;
+      }
+
+      .park-meta-row {
+        display: flex; align-items: flex-start; gap: 6px;
+        font-size: 12.5px; color: #55554a; margin-bottom: 4px; line-height: 1.4;
+      }
+      .park-meta-row svg { margin-top: 2px; flex-shrink: 0; }
+      .distance-row { color: var(--teal); font-weight: 600; }
+
+      .website-link {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 12px; color: var(--blaze); text-decoration: none; font-weight: 600;
+        margin: 2px 0 4px;
+      }
+      .website-link:hover { text-decoration: underline; }
+
+      .location-banner {
+        background: #FBF0E6; color: #8a4a1c; border: 1px solid #E8C7A3;
+        border-radius: 8px; padding: 9px 12px; font-size: 12.5px; margin-bottom: 12px;
+      }
+
+      .coord-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+      .view-tabs {
+        display: flex; gap: 6px; margin-top: 4px;
+      }
+      .view-tab {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 12.5px; font-weight: 600; font-family: 'Public Sans', sans-serif;
+        border: 1.3px solid var(--paper-line); background: white; color: #6b6b5f;
+        border-radius: 999px; padding: 6px 14px; cursor: pointer;
+      }
+      .view-tab-active { border-color: var(--canopy-light); color: var(--canopy-light); }
+
+      .map-wrap { padding: 14px 20px 24px; }
+      .map-canvas-outer {
+        position: relative;
+        width: 100%; height: 420px; max-height: 60vh;
+        background: white; border: 1px solid var(--paper-line); border-radius: 12px;
+        overflow: hidden;
+      }
+      .leaflet-map-el { width: 100%; height: 100%; }
+      .map-loading {
+        position: absolute; inset: 0; z-index: 500;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 8px; background: var(--paper); color: var(--canopy-light);
+        font-size: 13px; font-family: 'Public Sans', sans-serif;
+      }
+
+      .map-legend {
+        display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; margin-bottom: 6px;
+      }
+      .map-legend-item {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 11.5px; color: #55554a;
+      }
+      .map-legend-dot { width: 9px; height: 9px; border-radius: 999px; display: inline-block; }
+
+      .map-hint {
+        text-align: center; color: #8a8a78; font-size: 12.5px; margin-top: 14px;
+      }
+
+      .map-detail-card {
+        margin-top: 14px; background: white; border: 1px solid var(--paper-line);
+        border-radius: 12px; padding: 16px;
+      }
+
+      .map-empty-state {
+        display: flex; flex-direction: column; align-items: center; gap: 8px;
+        color: var(--canopy-light); padding: 40px 20px; text-align: center;
+      }
+
+      .activity-tags { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; }
+      .activity-tag {
+        font-size: 10.5px; background: #EDEBDC; color: #5b5b4d;
+        border-radius: 5px; padding: 3px 7px;
+      }
+
+      .rating-row { display: flex; align-items: center; gap: 4px; font-size: 12.5px; margin-bottom: 8px; color: #6b6b5f; }
+
+      .card-actions {
+        display: flex; align-items: center; gap: 8px; margin-top: 10px;
+        border-top: 1px solid var(--paper-line); padding-top: 10px;
+      }
+      .visit-btn {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 12px; font-weight: 600; font-family: 'Public Sans', sans-serif;
+        border: 1.3px solid var(--canopy-light); color: var(--canopy-light);
+        background: white; border-radius: 7px; padding: 6px 10px; cursor: pointer;
+      }
+      .visit-btn-active { background: var(--canopy-light); color: white; }
+      .text-btn {
+        display: inline-flex; align-items: center; gap: 3px;
+        background: none; border: none; color: #6b6b5f; font-size: 12px; cursor: pointer;
+        font-family: 'Public Sans', sans-serif;
+      }
+      .icon-btn {
+        background: none; border: none; cursor: pointer; color: #999; padding: 4px; display: flex;
+        margin-left: auto;
+      }
+      .icon-btn.danger:hover { color: #b13a1c; }
+
+      .notes-panel { margin-top: 10px; }
+      .info-note {
+        font-size: 12px; color: var(--teal); background: #EAF2EE;
+        border-radius: 6px; padding: 7px 9px; margin: 0 0 8px;
+      }
+
+      .field-label {
+        display: block; font-size: 11.5px; font-weight: 600; color: #6b6b5f;
+        margin: 10px 0 4px; text-transform: uppercase; letter-spacing: 0.4px;
+      }
+      .field-input {
+        width: 100%; border: 1px solid var(--paper-line); border-radius: 7px;
+        padding: 8px 10px; font-size: 13.5px; font-family: 'Public Sans', sans-serif;
+        color: var(--ink); background: white; resize: vertical;
+      }
+      .field-input:focus { outline: 2px solid var(--canopy-light); outline-offset: 1px; }
+
+      .add-form-backdrop {
+        position: fixed; inset: 0; background: rgba(27,31,26,0.45);
+        display: flex; align-items: flex-end; justify-content: center;
+        z-index: 50;
+      }
+      .add-form {
+        background: var(--paper); width: 100%; max-width: 480px;
+        border-radius: 16px 16px 0 0; padding: 18px 20px 26px;
+        max-height: 88vh; overflow-y: auto;
+      }
+      .add-form-header {
+        display: flex; align-items: center; justify-content: space-between;
+      }
+      .add-form-header h3 {
+        font-family: 'Zilla Slab', serif; margin: 0; color: var(--canopy); font-size: 19px;
+      }
+
+      @media (min-width: 640px) {
+        .add-form-backdrop { align-items: center; }
+        .add-form { border-radius: 16px; }
+      }
+    `}</style>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Mount
+// ---------------------------------------------------------------------------
+import { createRoot } from "react-dom/client";
+createRoot(document.getElementById("root")).render(<ParkExplorer />);
+</script>
+</body>
+</html>
