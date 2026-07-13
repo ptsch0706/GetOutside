@@ -66,6 +66,7 @@ import {
   List,
   ExternalLink,
   SlidersHorizontal,
+  ArrowLeft,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -1880,6 +1881,8 @@ function ParkMap({
   onToggleFavorite,
   onNotesChange,
   onDelete,
+  showBackButton,
+  onBack,
 }) {
   const leafletReady = useLeafletLoader();
   const containerRef = useRef(null);
@@ -1979,6 +1982,11 @@ function ParkMap({
 
   return (
     <div className="map-wrap">
+      {showBackButton && (
+        <button className="back-btn" onClick={onBack}>
+          <ArrowLeft size={16} /> Back
+        </button>
+      )}
       {locationStatus !== "granted" && (
         <div className="location-banner">
           Your position isn't shown on the map because location access isn't available. Parks are still plotted at their real locations.
@@ -2047,6 +2055,8 @@ export default function ParkExplorer() {
   const [activeView, setActiveView] = useState("list"); // list | map
   const [selectedParkId, setSelectedParkId] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
+  const [cameFromCard, setCameFromCard] = useState(false);
+  const returnScrollRef = useRef(0);
 
   useEffect(() => {
     if (!("geolocation" in navigator)) {
@@ -2161,8 +2171,18 @@ export default function ParkExplorer() {
   };
 
   const openParkOnMap = (parkId) => {
+    returnScrollRef.current = window.scrollY;
     setSelectedParkId(parkId);
     setActiveView("map");
+    setCameFromCard(true);
+  };
+
+  const goBackToList = () => {
+    setActiveView("list");
+    setCameFromCard(false);
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: returnScrollRef.current, behavior: "instant" in window ? "instant" : "auto" });
+    });
   };
 
   const activeFilterCount =
@@ -2348,13 +2368,19 @@ export default function ParkExplorer() {
         <div className="view-tabs">
           <button
             className={`view-tab ${activeView === "list" ? "view-tab-active" : ""}`}
-            onClick={() => setActiveView("list")}
+            onClick={() => {
+              setActiveView("list");
+              setCameFromCard(false);
+            }}
           >
             <List size={14} /> List
           </button>
           <button
             className={`view-tab ${activeView === "map" ? "view-tab-active" : ""}`}
-            onClick={() => setActiveView("map")}
+            onClick={() => {
+              setActiveView("map");
+              setCameFromCard(false);
+            }}
           >
             <MapIcon size={14} /> Map
           </button>
@@ -2373,6 +2399,8 @@ export default function ParkExplorer() {
           onToggleFavorite={toggleFavorite}
           onNotesChange={setNotes}
           onDelete={deletePark}
+          showBackButton={cameFromCard}
+          onBack={goBackToList}
         />
       ) : (
         <main className="park-grid">
@@ -2662,6 +2690,13 @@ function StyleBlock() {
       .view-tab-active { border-color: var(--canopy-light); color: var(--canopy-light); }
 
       .map-wrap { padding: 14px calc(20px + env(safe-area-inset-right)) 24px calc(20px + env(safe-area-inset-left)); }
+      .back-btn {
+        display: inline-flex; align-items: center; gap: 6px;
+        background: white; color: var(--canopy); border: 1.3px solid var(--paper-line);
+        border-radius: 8px; padding: 8px 13px; font-size: 13px; font-weight: 600;
+        font-family: 'Public Sans', sans-serif; cursor: pointer; margin-bottom: 12px;
+      }
+      .back-btn:hover { border-color: var(--canopy-light); background: #EAF2EE; }
       .map-canvas-outer {
         position: relative;
         width: 100%; height: 420px; max-height: 60vh;
