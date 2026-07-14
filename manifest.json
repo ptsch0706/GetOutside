@@ -1,6 +1,6 @@
 {
-  "name": "Get Outside — Park Explorer",
-  "short_name": "Get Outside",
+  "name": "Waypoint — Park Explorer",
+  "short_name": "Waypoint",
   "description": "Personal park finder and visit tracker for the Tampa Bay area.",
   "start_url": "./index.html",
   "display": "standalone",
