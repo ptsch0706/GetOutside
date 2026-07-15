@@ -69,6 +69,11 @@ import {
   ArrowLeft,
   Route,
   History as HistoryIcon,
+  Beer,
+  ShoppingBasket,
+  Coffee,
+  Landmark,
+  Building2,
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
@@ -81,6 +86,11 @@ const TYPE_META = {
   nature: { label: "Nature Preserve", icon: TreePine, color: "#4B7A3E" },
   dog: { label: "Dog Park", icon: Dog, color: "#C1541C" },
   trail: { label: "Regional Trail", icon: Route, color: "#3D6EB0" },
+  brewery: { label: "Brewery", icon: Beer, color: "#B8860B" },
+  farmers_market: { label: "Farmers Market", icon: ShoppingBasket, color: "#8FA31E" },
+  coffee: { label: "Coffee Shop", icon: Coffee, color: "#6F4E37" },
+  museum: { label: "Museum", icon: Building2, color: "#5B4B8A" },
+  historic: { label: "Historic Site", icon: Landmark, color: "#6E6259" },
 };
 
 const ACTIVITY_OPTIONS = [
@@ -443,6 +453,107 @@ const PARK_COORDS = {
   "seed-339": [27.9281181, -82.586272],
   "seed-340": [28.2483859, -82.6009385],
   "seed-341": [27.7391866, -82.6897959],
+  "seed-342": [27.9607128, -82.444755],
+  "seed-343": [27.9667597, -82.4674765],
+  "seed-344": [27.9562878, -82.430219],
+  "seed-345": [27.9573791, -82.4596538],
+  "seed-346": [27.9586543, -82.4438508],
+  "seed-347": [27.959295, -82.459935],
+  "seed-348": [27.7827077, -82.6576922],
+  "seed-349": [27.7691667, -82.6627778],
+  "seed-350": [27.7715707, -82.650684],
+  "seed-351": [27.7718006, -82.64101],
+  "seed-352": [27.9868587, -82.7512497],
+  "seed-353": [28.0140373, -82.7875393],
+  "seed-354": [28.0137414, -82.7890185],
+  "seed-355": [27.9956136, -82.4298681],
+  "seed-356": [27.9613473, -82.4390309],
+  "seed-357": [27.9364549, -82.4751943],
+  "seed-358": [27.9442231, -82.450412],
+  "seed-359": [27.9992588, -82.5606918],
+  "seed-360": [27.7739887, -82.6374558],
+  "seed-361": [27.8641007, -82.6286938],
+  "seed-362": [27.95142, -82.4771636],
+  "seed-363": [27.9513322, -82.4475076],
+  "seed-364": [28.0728871, -82.5219324],
+  "seed-365": [27.9942039, -82.4596993],
+  "seed-366": [28.0337389, -82.4756196],
+  "seed-367": [27.9671602, -82.4682948],
+  "seed-368": [27.7712814, -82.6575765],
+  "seed-369": [27.7708675, -82.6661448],
+  "seed-370": [27.8175983, -82.7289505],
+  "seed-371": [27.775253, -82.6342634],
+  "seed-372": [27.7700657, -82.6364851],
+  "seed-373": [27.7713624, -82.6492937],
+  "seed-374": [27.7732051, -82.6464768],
+  "seed-375": [27.7708584, -82.6633872],
+  "seed-376": [28.0156833, -82.7900431],
+  "seed-377": [27.9422928, -82.787734],
+  "seed-378": [27.9597545, -82.7996364],
+  "seed-379": [27.9667345, -82.8000563],
+  "seed-380": [27.9494852, -82.4629535],
+  "seed-381": [27.9423647, -82.4498608],
+  "seed-382": [27.943972, -82.4448747],
+  "seed-383": [27.949577, -82.461494],
+  "seed-384": [28.053307, -82.4055353],
+  "seed-385": [27.7659086, -82.6315789],
+  "seed-386": [27.774421, -82.631884],
+  "seed-387": [27.7635075, -82.6687474],
+  "seed-388": [27.7712671, -82.6593797],
+  "seed-389": [27.7710579, -82.6347877],
+  "seed-390": [27.7706009, -82.6405353],
+  "seed-391": [27.9608921, -82.4392263],
+  "seed-392": [27.9463553, -82.4640404],
+  "seed-393": [27.9609824, -82.6996305],
+  "seed-394": [27.7875569, -82.753376],
+  "seed-395": [27.8812541, -82.8107448],
+  "seed-396": [27.9586469, -82.800472],
+  "seed-397": [27.8706342, -82.7356049],
+  "seed-398": [27.8303039, -82.7004301],
+  "seed-399": [27.8816098, -82.8501205],
+  "seed-400": [27.9182699, -82.7602388],
+  "seed-401": [27.8546064, -82.316413],
+  "seed-402": [27.887742, -82.2379389],
+  "seed-403": [28.0100358, -82.4506185],
+  "seed-404": [27.9875112, -82.6987549],
+  "seed-405": [27.9905359, -82.6940357],
+  "seed-406": [28.0695725, -82.7763837],
+  "seed-407": [28.0740221, -82.767707],
+  "seed-408": [28.0382117, -82.6475907],
+  "seed-409": [27.8722931, -82.7920301],
+  "seed-410": [28.0789555, -82.770613],
+  "seed-411": [28.0723693, -82.7677226],
+  "seed-412": [27.8928719, -82.3379042],
+  "seed-413": [28.0479109, -82.1317324],
+  "seed-414": [27.93437, -82.2530358],
+  "seed-415": [27.8785957, -82.3080274],
+  "seed-416": [28.0118546, -82.1361061],
+  "seed-417": [27.917449, -82.7482143],
+  "seed-418": [27.8738669, -82.7628724],
+  "seed-419": [27.8855648, -82.8123462],
+  "seed-420": [27.8407607, -82.7887394],
+  "seed-421": [28.0551295, -82.7645239],
+  "seed-422": [27.8924617, -82.8318749],
+  "seed-423": [27.8234978, -82.8275189],
+  "seed-424": [27.8396009, -82.7666032],
+  "seed-425": [27.9348492, -82.2942799],
+  "seed-426": [27.9123923, -82.3470673],
+  "seed-427": [27.8611858, -82.2010026],
+  "seed-428": [27.9382353, -82.3171784],
+  "seed-429": [27.9329359, -82.3268082],
+  "seed-430": [27.8544892, -82.3256927],
+  "seed-431": [27.8611858, -82.2010026],
+  "seed-432": [28.121748, -82.746474],
+  "seed-433": [28.1461682, -82.7606614],
+  "seed-434": [28.1463666, -82.7556219],
+  "seed-435": [28.1683662, -82.7544198],
+  "seed-436": [28.1459264, -82.7547794],
+  "seed-437": [28.0156949, -82.1218388],
+  "seed-438": [27.8649002, -82.3774181],
+  "seed-439": [28.0280528, -82.1922056],
+  "seed-440": [28.1551042, -82.7609624],
+  "seed-441": [28.1483891, -82.7596459],
+  "seed-442": [28.1670214, -82.8446717],
 };
 
 // Official website lookup for seeded parks, keyed by id. Many parks share the
@@ -474,6 +585,7 @@ const SEMINOLE_CITY = "https://www.myseminole.com/website/recreation.html";
 const PLANT_CITY = "https://www.plantcitygov.com/departments/community_amenities/parks_recreation/index.php";
 const ZEPHYRHILLS = "https://www.zephyrhills.gov/208/Parks-Recreation";
 const fsp = (slug) => `https://www.floridastateparks.org/parks-and-trails/${slug}`;
+const gmaps = (placeId) => `https://www.google.com/maps/place/?q=place_id:${placeId}`;
 
 const PARK_WEBSITES = {
   "seed-1": TAMPA, "seed-2": TAMPA, "seed-3": TAMPA, "seed-4": TAMPA, "seed-5": TAMPA,
@@ -709,6 +821,107 @@ const PARK_WEBSITES = {
   "seed-339": HC_GENERAL,
   "seed-340": PASCO,
   "seed-341": PINELLAS,
+  "seed-342": gmaps("ChIJV67VezXFwogReSFOg1TikEw"),
+  "seed-343": gmaps("ChIJ7xQUtOfFwogRXFXzlR1US88"),
+  "seed-344": gmaps("ChIJy3uaZKvFwogRpk-ruMef9nE"),
+  "seed-345": gmaps("ChIJvWBj9EjFwogRdqdIdIPeYyo"),
+  "seed-346": gmaps("ChIJf4TWHkPFwogRm4rNhzTIPC8"),
+  "seed-347": gmaps("ChIJP5IJEWTEwogRGG32fm4iHtw"),
+  "seed-348": gmaps("ChIJTTxhRh3jwogRqkl3aF6iKG8"),
+  "seed-349": gmaps("ChIJ28aBEDHiwogRzv5VMM80mE0"),
+  "seed-350": gmaps("ChIJX4uaOyriwogRzIxSK7vLFj4"),
+  "seed-351": gmaps("ChIJKTnyvIPhwogRSh8chhv9O-k"),
+  "seed-352": gmaps("ChIJ22-W5zbwwogR6h114JaPeTM"),
+  "seed-353": gmaps("ChIJORnVJn3xwogR9Gp1XEOAtic"),
+  "seed-354": gmaps("ChIJw1KNKWPxwogRpoD6Ocpt6lU"),
+  "seed-355": gmaps("ChIJ3WukEtXFwogRBVjhaWySiao"),
+  "seed-356": gmaps("ChIJR3FEllHEwogROteWqKfdeJw"),
+  "seed-357": gmaps("ChIJsTZmISDFwogRRBlWaUPE54k"),
+  "seed-358": gmaps("ChIJl6YOIFnFwogRnoM5w3DYxow"),
+  "seed-359": gmaps("ChIJbypdxwDCwogRbOYVxgtEBZo"),
+  "seed-360": gmaps("ChIJPRapcZzhwogRZwBXnkjb7Jw"),
+  "seed-361": gmaps("ChIJPwrYrGDlwogRbrY2B3wbVTI"),
+  "seed-362": gmaps("ChIJEUD0un_DwogRcOkSPk-VGbE"),
+  "seed-363": gmaps("ChIJP-TRGvbEwogRjHpn8O9NYYw"),
+  "seed-364": gmaps("ChIJc9TZhGDAwogRRHZ5EzKtJIc"),
+  "seed-365": gmaps("ChIJaYVkGhzEwogRpmWVf8uJnoY"),
+  "seed-366": gmaps("ChIJpV9pjc3BwogR2IMzMVtvIqk"),
+  "seed-367": gmaps("ChIJBdVltRzFwogRLS4pltofRn8"),
+  "seed-368": gmaps("ChIJN9sKYpbjwogRi6sY8V5GVhM"),
+  "seed-369": gmaps("ChIJvcPn1ovjwogRdn0kBeTj2gU"),
+  "seed-370": gmaps("ChIJFwBNSoDjwogRJIQ_c6jkqtw"),
+  "seed-371": gmaps("ChIJMXRZ34bhwogR18X29qVsnLk"),
+  "seed-372": gmaps("ChIJ8W_zEkDhwogRzOhHc7D_J1Y"),
+  "seed-373": gmaps("ChIJB2cBINfjwogRpbaMwxCtAjw"),
+  "seed-374": gmaps("ChIJvdgK6t_hwogRoUREbQ9hnTI"),
+  "seed-375": gmaps("ChIJH4nBh7njwogR9-90w497TAE"),
+  "seed-376": gmaps("ChIJNRPELPbxwogRdC5OpPLO1eo"),
+  "seed-377": gmaps("ChIJHVKmsYLxwogR5kXp2-Aqeuw"),
+  "seed-378": gmaps("ChIJN_ZtcNrxwogRQQ0HWa34tIE"),
+  "seed-379": gmaps("ChIJ14xaI97wwogRNukxGupFxn4"),
+  "seed-380": gmaps("ChIJy6ESWITDwogReu72OLauRMM"),
+  "seed-381": gmaps("ChIJJboiAY3EwogRJCLbox7T-70"),
+  "seed-382": gmaps("ChIJCXAq5_DEwogRjTPE2xlsZtE"),
+  "seed-383": gmaps("ChIJ-6lKAInEwogRVnf5NBtjZss"),
+  "seed-384": gmaps("ChIJq6E9W8_HwogRUggO5759Ook"),
+  "seed-385": gmaps("ChIJyaCQzpHhwogRBdPcZI6UOyc"),
+  "seed-386": gmaps("ChIJH_yrCJ7hwogRBdasI9ePfT0"),
+  "seed-387": gmaps("ChIJs9YbCILjwogRLrEPeOStU7o"),
+  "seed-388": gmaps("ChIJyzrZADLiwogRDSaWoWljzTE"),
+  "seed-389": gmaps("ChIJAeUXYJzhwogR6wyvACYOPp8"),
+  "seed-390": gmaps("ChIJwz9hhIPhwogRgj4JT_bYNGo"),
+  "seed-391": gmaps("ChIJR_Wrg-fFwogRUIk0jJIOQW8"),
+  "seed-392": gmaps("ChIJNaDOUI_EwogRIUxGNqbJv-Q"),
+  "seed-393": gmaps("ChIJcZqqSqzvwogRMlCimgEQbGU"),
+  "seed-394": gmaps("ChIJLQ5BNNz8wogR50aBX-Be78o"),
+  "seed-395": gmaps("ChIJC8LjwjH6wogRKE2kKOD0BkI"),
+  "seed-396": gmaps("ChIJYTwoxK_xwogRDFLqeGyRz7A"),
+  "seed-397": gmaps("ChIJWc1WJCv7wogRJ9fZgX9Y0Pg"),
+  "seed-398": gmaps("ChIJqeVU78HlwogRyfz7zJswSDk"),
+  "seed-399": gmaps("ChIJB87U3ur5wogRNr_vPH0TKUI"),
+  "seed-400": gmaps("ChIJ7--Jkp76wogRl6SKAI9CvOY"),
+  "seed-401": gmaps("ChIJKS49UpzRwogRfbEkZEZ-AIg"),
+  "seed-402": gmaps("ChIJpf1KtJjSwogR5hWnhGJDCjw"),
+  "seed-403": gmaps("ChIJPd4_TQDHwogRKrtjtA-zjdM"),
+  "seed-404": gmaps("ChIJi2KIll3uwogR7YzfJtU3mjk"),
+  "seed-405": gmaps("ChIJ5zPS-GDuwogRORXpOoX9ZBs"),
+  "seed-406": gmaps("ChIJn31SJhXzwogRcQikIakK3YY"),
+  "seed-407": gmaps("ChIJA-xYqvrywogRBJVPSDYunlc"),
+  "seed-408": gmaps("ChIJ95TBA4rrwogRTNoX7c8Cjzw"),
+  "seed-409": gmaps("ChIJvwh2K537wogRmuo7ZG_axzo"),
+  "seed-410": gmaps("ChIJlVLkGfjzwogRvCnGeDJnIKs"),
+  "seed-411": gmaps("ChIJE3SJ4snzwogRty7IUkcFM9E"),
+  "seed-412": gmaps("ChIJPXAazNbRwogRY8aFE3s0diA"),
+  "seed-413": gmaps("ChIJ_0fAXd413YgRMw3Kjorw-Yo"),
+  "seed-414": gmaps("ChIJRwRUd43NwogRj5A4eF0X8JE"),
+  "seed-415": gmaps("ChIJsZsekPPRwogRhOoicyGymP4"),
+  "seed-416": gmaps("ChIJJ1CIiiQ03YgRr_Xd_Xb7VvI"),
+  "seed-417": gmaps("ChIJ-2KnCdj7wogRw9TG2FlO22Q"),
+  "seed-418": gmaps("ChIJNfvnBOP7wogRhVJiJXs-4e0"),
+  "seed-419": gmaps("ChIJN_-XrK77wogRdHnRjMZ9lqw"),
+  "seed-420": gmaps("ChIJB0CVVnX7wogR0NppaY31QWg"),
+  "seed-421": gmaps("ChIJd4DGAKzzwogRJwxhXgpCcIE"),
+  "seed-422": gmaps("ChIJuxdY8p_5wogRYKOZJx6VtKw"),
+  "seed-423": gmaps("ChIJw1qFHwX_wogRrkIFdim_iZY"),
+  "seed-424": gmaps("ChIJWVfI2R77wogRobEnkJABefI"),
+  "seed-425": gmaps("ChIJuxEmA9HNwogRXqkCpRWPRKo"),
+  "seed-426": gmaps("ChIJo9W8ZdnPwogRU1JN4C3JQoM"),
+  "seed-427": gmaps("ChIJ0ScRB4PTwogR7f3MteEkjX8"),
+  "seed-428": gmaps("ChIJjZrtFU_PwogR4sHHfmTAYCQ"),
+  "seed-429": gmaps("ChIJKdnGIWjPwogReutrltiOAVI"),
+  "seed-430": gmaps("ChIJ6Y7Ih5PRwogRNmzenIALkmE"),
+  "seed-431": gmaps("ChIJ04ZNOt3RwogRVFWAQ_ojHpU"),
+  "seed-432": gmaps("ChIJLa-4KEWNwogR-Ars13eoDeo"),
+  "seed-433": gmaps("ChIJZ-w7NQyNwogRT79XYeH7jHc"),
+  "seed-434": gmaps("ChIJY-2GJXONwogRkXC6444uIwc"),
+  "seed-435": gmaps("ChIJ297xXaeNwogRighWKQqMnAY"),
+  "seed-436": gmaps("ChIJN-8s4HKNwogRM0esGJrqe4I"),
+  "seed-437": gmaps("ChIJWwcrr4Q23YgRkiDfCZ1jQ7Q"),
+  "seed-438": gmaps("ChIJlTlkMWXQwogRXxchb7LYtzA"),
+  "seed-439": gmaps("ChIJleFCpOE03YgR_W7zvLgzvVQ"),
+  "seed-440": gmaps("ChIJLaXWcqCNwogRM9JpPLc64RE"),
+  "seed-441": gmaps("ChIJdZRVZQyNwogRtBCTeITX5bw"),
+  "seed-442": gmaps("ChIJMwjaSKKLwogRwzhmW5luPe8"),
 };
 
 function getParkWebsite(park) {
@@ -3987,6 +4200,1016 @@ const SEED_PARKS = [
     infoNote: "Southern trail segment near Clam Bayou, part of the St. Pete trail network leading toward the Sunshine Skyway.",
   },
   {
+    id: "seed-342",
+    name: "Sky Puppy Brewing",
+    type: "brewery",
+    address: "1313 E 8th Ave, Tampa, FL 33605",
+    hours: "Mon closed; Tue–Thu 3–8 PM; Fri–Sat 1–11 PM; Sun 12–7 PM",
+    activities: [],
+    rating: 5.0,
+    infoNote: "Housed in Tampa's original 1888 firehouse in Ybor City, with rotating local art and a bat-themed decor.",
+  },
+  {
+    id: "seed-343",
+    name: "Woven Water Brewing Company",
+    type: "brewery",
+    address: "456 W Columbus Dr, Tampa, FL 33602",
+    hours: "Mon–Thu 2–10 PM; Fri–Sat 12–10 PM; Sun 12–8 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Known for hazy IPAs and smoothie sours. Dog-friendly, quiet vibe.",
+  },
+  {
+    id: "seed-344",
+    name: "Coppertail Brewing Co.",
+    type: "brewery",
+    address: "2601 E 2nd Ave, Tampa, FL 33605",
+    hours: "Mon–Thu 11 AM–11 PM; Fri–Sat 11 AM–12 AM; Sun 11 AM–9 PM",
+    activities: [],
+    rating: 4.6,
+    infoNote: "Full brewpub menu alongside the beer, weekend brewery tours available.",
+  },
+  {
+    id: "seed-345",
+    name: "Magnanimous Brewing Tampa Heights",
+    type: "brewery",
+    address: "1420 N Florida Ave, Tampa, FL 33602",
+    hours: "Daily, 12–10 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Mug club with two locations, retro arcade and pinball machines inside.",
+  },
+  {
+    id: "seed-346",
+    name: "BarrieHaus Beer Co",
+    type: "brewery",
+    address: "1403 E 5th Ave, Tampa, FL 33605",
+    hours: "Mon–Thu 3–10 PM; Fri–Sun 12–11 PM",
+    activities: [],
+    rating: 4.9,
+    infoNote: "German-style lagers and pilsners, smoke-free outdoor beer garden.",
+  },
+  {
+    id: "seed-347",
+    name: "Hidden Springs Ale Works",
+    type: "brewery",
+    address: "1631 N Franklin St, Tampa, FL 33602",
+    hours: "Mon–Tue 2–8 PM; Wed–Thu 3–9 PM; Fri–Sat 12–10 PM; Sun 12–6 PM",
+    activities: [],
+    rating: 4.6,
+    infoNote: "Barrel-aged beers and sours are the specialty; small pours so you can try more styles.",
+  },
+  {
+    id: "seed-348",
+    name: "Outcast Brewing Company",
+    type: "brewery",
+    address: "1776 11th Ave N, St. Petersburg, FL 33713",
+    hours: "Mon closed; Tue–Thu 2–10 PM; Fri 2–11 PM; Sat 11 AM–11 PM; Sun 11 AM–10 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Live jazz and rotating food trucks in a spacious indoor/outdoor setup.",
+  },
+  {
+    id: "seed-349",
+    name: "3 Daughters Brewing",
+    type: "brewery",
+    address: "222 22nd St S, St. Petersburg, FL 33712",
+    hours: "Mon–Thu 11:30 AM–10 PM; Fri–Sat 11:30 AM–12 AM; Sun 11:30 AM–8 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Large warehouse taproom with live music, arcade games, and a big outdoor area. Dog and toddler friendly.",
+  },
+  {
+    id: "seed-350",
+    name: "Green Bench Brewing Co.",
+    type: "brewery",
+    address: "1133 Baum Ave N, St. Petersburg, FL 33705",
+    hours: "Mon–Thu 12–10 PM; Fri–Sat 12 PM–12 AM; Sun 12–9 PM",
+    activities: [],
+    rating: 4.6,
+    infoNote: "One of the best beer gardens in the region, right in downtown St. Pete.",
+  },
+  {
+    id: "seed-351",
+    name: "St. Pete Brewing Company",
+    type: "brewery",
+    address: "544 1st Ave N, St. Petersburg, FL 33701",
+    hours: "Daily, 12 PM–12 AM",
+    activities: [],
+    rating: 4.6,
+    infoNote: "Dog-friendly patio, plus comedy shows and events some nights.",
+  },
+  {
+    id: "seed-352",
+    name: "Southern Lights Brewing Company",
+    type: "brewery",
+    address: "2075 Sunnydale Blvd, Clearwater, FL 33765",
+    hours: "Mon–Thu 2–10 PM; Fri 2–11 PM; Sat 12–11 PM; Sun 12–9 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Pinball, video games, and rotating food trucks (no kitchen on site).",
+  },
+  {
+    id: "seed-353",
+    name: "Dunedin Brewery",
+    type: "brewery",
+    address: "937 Douglas Ave, Dunedin, FL 34698",
+    hours: "Mon–Wed 11 AM–9 PM; Thu 11 AM–10 PM; Fri–Sat 11 AM–12 AM; Sun 11 AM–8 PM",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Florida's oldest craft brewery — full food menu, live music most weekends.",
+  },
+  {
+    id: "seed-354",
+    name: "HOB Brewing Co.",
+    type: "brewery",
+    address: "931 Huntley Ave, Dunedin, FL 34698",
+    hours: "Mon–Thu 12–10 PM; Fri 12 PM–12 AM; Sat 11 AM–12 AM; Sun 11 AM–9 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Dog-friendly with large covered outdoor seating, frequent food truck events.",
+  },
+  {
+    id: "seed-355",
+    name: "Sanwa Farmer's Market",
+    type: "farmers_market",
+    address: "2621 E Hillsborough Ave, Tampa, FL 33610",
+    hours: "Mon–Sat 4 AM–8 PM; Sun 8 AM–5 PM",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Year-round international grocery market with an enormous selection of fresh produce.",
+  },
+  {
+    id: "seed-356",
+    name: "Ybor City Saturday Market",
+    type: "farmers_market",
+    address: "1800 E 8th Ave, Tampa, FL 33605",
+    hours: "Sat, 9 AM–1 PM",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Produce, crafts, and local art in Centennial Park — watch for the free-roaming Ybor chickens.",
+  },
+  {
+    id: "seed-357",
+    name: "Hyde Park Village Fresh Market",
+    type: "farmers_market",
+    address: "742 S Village Cir, Tampa, FL 33606",
+    hours: "Sun, 10 AM–2 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Vendor market in Hyde Park Village — go early, parking fills up fast.",
+  },
+  {
+    id: "seed-358",
+    name: "Water Street Sunday Market",
+    type: "farmers_market",
+    address: "Water St, Tampa, FL 33602",
+    hours: "Sun, 10 AM–2 PM",
+    activities: [],
+    rating: 5.0,
+    infoNote: "Crafts, food, and live painting in a shaded stretch of downtown Tampa.",
+  },
+  {
+    id: "seed-359",
+    name: "Sweetwater Organic Community Farm",
+    type: "farmers_market",
+    address: "5521 Hanley Rd, Tampa, FL 33634",
+    hours: "Sun, 12–3 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Working organic farm with an on-site market and café; tours available.",
+  },
+  {
+    id: "seed-360",
+    name: "St. Petersburg Saturday Morning Market",
+    type: "farmers_market",
+    address: "212 3rd St N, St. Petersburg, FL 33701",
+    hours: "Sat, 9 AM–1 PM (seasonal)",
+    activities: [],
+    rating: 4.7,
+    infoNote: "One of the largest markets in the Southeast — waterfront, live music, dozens of vendors.",
+  },
+  {
+    id: "seed-361",
+    name: "Pinellas Farmers and Flea Market",
+    type: "farmers_market",
+    address: "10490 Gandy Blvd N, St. Petersburg, FL 33702",
+    hours: "Sat–Sun, 7 AM–1 PM",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Combined produce and flea market — good for both groceries and browsing.",
+  },
+  {
+    id: "seed-362",
+    name: "The Lab Coffee — West Tampa",
+    type: "coffee",
+    address: "1703 W State St, Tampa, FL 33606",
+    hours: "Mon–Fri 7 AM–2 PM; Sat–Sun 8 AM–2 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Roasts its own beans; Cuban-inspired breakfast items are a standout.",
+  },
+  {
+    id: "seed-363",
+    name: "Ginger Beard Coffee",
+    type: "coffee",
+    address: "1208 E Kennedy Blvd Unit 112, Tampa, FL 33602",
+    hours: "Mon–Fri 7 AM–2 PM; Sat–Sun 8 AM–12 PM",
+    activities: [],
+    rating: 4.9,
+    infoNote: "Dog-friendly; the peanut butter cold brew has a cult following.",
+  },
+  {
+    id: "seed-364",
+    name: "The Perfect Press Coffee Co.",
+    type: "coffee",
+    address: "4526 W Village Dr, Tampa, FL 33624",
+    hours: "Mon closed; Tue–Fri 7 AM–3 PM; Sat–Sun 8 AM–4 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Right across from Carrollwood Village Park — good pairing for a coffee-then-park morning.",
+  },
+  {
+    id: "seed-365",
+    name: "Spaddy's Coffee Co.",
+    type: "coffee",
+    address: "5206 N Florida Ave, Tampa, FL 33603",
+    hours: "Daily, 7 AM–2 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Roasts its own beans, shaded courtyard seating, well-known breakfast burrito.",
+  },
+  {
+    id: "seed-366",
+    name: "CoffeeMe",
+    type: "coffee",
+    address: "1457 W Busch Blvd, Tampa, FL 33612",
+    hours: "Mon–Fri 6 AM–5 PM; Sat–Sun 7 AM–5 PM",
+    activities: [],
+    rating: 4.9,
+    infoNote: "Specialty seasonal drinks and a handwritten note on every cup.",
+  },
+  {
+    id: "seed-367",
+    name: "Heights Lounge",
+    type: "coffee",
+    address: "723 W Columbus Dr, Tampa, FL 33602",
+    hours: "Mon–Thu 7 AM–12 AM; Fri 7 AM–1 AM; Sat 9 AM–1 AM; Sun 11 AM–12 AM",
+    activities: [],
+    rating: 5.0,
+    infoNote: "Coffee and kombucha by day, hookah lounge with live music by night.",
+  },
+  {
+    id: "seed-368",
+    name: "The Under Grounds Coffee Co",
+    type: "coffee",
+    address: "1799 Central Ave, St. Petersburg, FL 33713",
+    hours: "Mon–Wed 7 AM–1 PM; Thu–Sat 7 AM–5 PM; Sun 8 AM–5 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Single-origin, ethically sourced espresso with a smooth caramel-like finish.",
+  },
+  {
+    id: "seed-369",
+    name: "Say Coffee House",
+    type: "coffee",
+    address: "2414 Central Ave, St. Petersburg, FL 33712",
+    hours: "Daily, 8 AM–4 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Vietnamese-style coffee, including a well-loved egg coffee.",
+  },
+  {
+    id: "seed-370",
+    name: "LaCa Coffeehouse",
+    type: "coffee",
+    address: "5038 66th St N, St. Petersburg, FL 33709",
+    hours: "Mon–Fri 8 AM–3 PM; Sat–Sun 8 AM–4 PM",
+    activities: [],
+    rating: 4.9,
+    infoNote: "House-made pastries and unique dessert-inspired lattes.",
+  },
+  {
+    id: "seed-371",
+    name: "Lucky Cup Coffee Co.",
+    type: "coffee",
+    address: "101 3rd Ave N, St. Petersburg, FL 33701",
+    hours: "Daily, 7 AM–2 PM",
+    activities: [],
+    rating: 4.9,
+    infoNote: "Tucked inside a boutique hotel downtown; dairy-free cold foams available.",
+  },
+  {
+    id: "seed-372",
+    name: "Bad Mother",
+    type: "coffee",
+    address: "260 1st Ave S, St. Petersburg, FL 33701",
+    hours: "Mon–Fri 7:30 AM–4 PM; Sat–Sun 8:30 AM–4 PM",
+    activities: [],
+    rating: 4.6,
+    infoNote: "Empanadas and breakfast burritos alongside the coffee; occasional DJ events.",
+  },
+  {
+    id: "seed-373",
+    name: "Café COPA",
+    type: "coffee",
+    address: "1045 Central Ave, St. Petersburg, FL 33705",
+    hours: "Mon closed; Tue–Sat 10 AM–4 PM; Sun 10 AM–6 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Cuban-inspired sandwiches and cafecito, with local art on the walls.",
+  },
+  {
+    id: "seed-374",
+    name: "Daycation Coffee",
+    type: "coffee",
+    address: "189 Dr M.L.K. Jr St N, St. Petersburg, FL 33701",
+    hours: "Mon–Fri 8 AM–3 PM; Sat–Sun 9 AM–3 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Asian-inspired specialty drinks; expect a line but it moves fast.",
+  },
+  {
+    id: "seed-375",
+    name: "Pour and Decor",
+    type: "coffee",
+    address: "2210 Central Ave, St. Petersburg, FL 33712",
+    hours: "Mon–Wed 8 AM–2 PM; Thu–Fri 8 AM–5 PM; Sat 9 AM–4 PM; Sun closed",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Coffee shop and home-goods/gift shop combined; signature purple latte art.",
+  },
+  {
+    id: "seed-376",
+    name: "SaddleBred Cafe",
+    type: "coffee",
+    address: "990 Broadway, Dunedin, FL 34698",
+    hours: "Daily, 7 AM–7 PM",
+    activities: [],
+    rating: 4.9,
+    infoNote: "Western-themed decor; donates a portion of profits to animal rescue.",
+  },
+  {
+    id: "seed-377",
+    name: "Southie Coffee Roasters",
+    type: "coffee",
+    address: "1500 S Missouri Ave, Clearwater, FL 33756",
+    hours: "Mon–Fri 7 AM–3 PM; Sat–Sun 8 AM–3 PM",
+    activities: [],
+    rating: 4.9,
+    infoNote: "Roasts its own beans on site; eclectic, cozy decor.",
+  },
+  {
+    id: "seed-378",
+    name: "DRIP Clearwater",
+    type: "coffee",
+    address: "551 S Ft Harrison Ave, Clearwater, FL 33756",
+    hours: "Mon–Sat 9 AM–10 PM; Sun 11 AM–8 PM",
+    activities: [],
+    rating: 4.9,
+    infoNote: "Coffee, botanical tea, and kava bar with table games — a hangout, not just a quick stop.",
+  },
+  {
+    id: "seed-379",
+    name: "Restoration Cafe",
+    type: "coffee",
+    address: "38 N Fort Harrison Ave, Clearwater, FL 33755",
+    hours: "Mon–Thu 7 AM–7 PM; Fri–Sat 7/8 AM–9 PM; Sun closed",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Doubles as a church space on Sundays; known for fresh-baked muffins.",
+  },
+  {
+    id: "seed-380",
+    name: "Tampa Museum of Art",
+    type: "museum",
+    address: "120 W Gasparilla Plaza, Tampa, FL 33602",
+    hours: "Mon–Wed 10 AM–5 PM; Thu 10 AM–8 PM; Fri–Sun 10 AM–5 PM",
+    activities: [],
+    rating: 4.2,
+    infoNote: "Riverwalk views and a rotating mix of contemporary and classical exhibits. About a 1–2 hour visit.",
+  },
+  {
+    id: "seed-381",
+    name: "Tampa Bay History Center",
+    type: "museum",
+    address: "801 Water St, Tampa, FL 33602",
+    hours: "Daily, 10 AM–5 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Florida history from Indigenous cultures through today, plus a waterfront observation deck.",
+  },
+  {
+    id: "seed-382",
+    name: "The Florida Aquarium",
+    type: "museum",
+    address: "701 Channelside Dr, Tampa, FL 33602",
+    hours: "Daily, 9 AM–6 PM",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Touch tanks and timed-entry tickets; book ahead for the best experience.",
+  },
+  {
+    id: "seed-383",
+    name: "Glazer Children's Museum",
+    type: "museum",
+    address: "110 W Gasparilla Plaza, Tampa, FL 33602",
+    hours: "Daily, 9:30 AM–5 PM",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Three floors of hands-on exhibits including a large water play area.",
+  },
+  {
+    id: "seed-384",
+    name: "MOSI (Museum of Science & Industry)",
+    type: "museum",
+    address: "4801 E Fowler Ave, Tampa, FL 33617",
+    hours: "Daily, 10 AM–5 PM",
+    activities: [],
+    rating: 3.9,
+    infoNote: "Domed planetarium/IMAX theater is the highlight; some exhibits feel dated per recent reviews.",
+  },
+  {
+    id: "seed-385",
+    name: "The Dalí Museum",
+    type: "museum",
+    address: "1 Dali Blvd, St. Petersburg, FL 33701",
+    hours: "Mon–Wed 10 AM–6 PM; Thu 10 AM–8 PM; Fri–Sun 10 AM–6 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "The largest collection of Salvador Dalí's work outside Spain, in a building with an iconic glass 'Enigma' dome.",
+  },
+  {
+    id: "seed-386",
+    name: "Museum of Fine Arts",
+    type: "museum",
+    address: "255 Beach Dr NE, St. Petersburg, FL 33701",
+    hours: "Mon closed; Tue–Sun 10 AM–5 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Impressionist and classical collection in a quiet, walkable waterfront setting.",
+  },
+  {
+    id: "seed-387",
+    name: "FloridaRAMA",
+    type: "museum",
+    address: "2606 Fairfield Ave S Bldg 5, St. Petersburg, FL 33712",
+    hours: "Wed closed; Mon–Tue/Thu–Fri 12–8 PM; Sat–Sun 10 AM–8 PM",
+    activities: [],
+    rating: 4.4,
+    infoNote: "Immersive interactive art installations with a scavenger-hunt storyline running through them.",
+  },
+  {
+    id: "seed-388",
+    name: "Imagine Museum",
+    type: "museum",
+    address: "1901 Central Ave, St. Petersburg, FL 33713",
+    hours: "Mon closed; Tue/Thu 10 AM–8 PM; Wed/Fri–Sun 10 AM–5 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Contemporary glass art across two floors; $5 tickets Sunday mornings 10 AM–12 PM.",
+  },
+  {
+    id: "seed-389",
+    name: "The James Museum of Western & Wildlife Art",
+    type: "museum",
+    address: "150 Central Ave, St. Petersburg, FL 33701",
+    hours: "Mon 10 AM–5 PM; Tue 10 AM–8 PM; Wed–Sun 10 AM–5 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Western and wildlife art with a sculpture garden courtyard; well-reviewed guided tours.",
+  },
+  {
+    id: "seed-390",
+    name: "The Florida Holocaust Museum",
+    type: "museum",
+    address: "55 5th St S, St. Petersburg, FL 33701",
+    hours: "Daily, 10 AM–4 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "One of the largest Holocaust museums in the US. Security screening and clear-bag policy on entry.",
+  },
+  {
+    id: "seed-391",
+    name: "Ybor City Historic District",
+    type: "historic",
+    address: "1865 Angel Oliva Senior St, Tampa, FL 33605",
+    hours: "Open 24 hours (district)",
+    activities: [],
+    rating: 4.8,
+    infoNote: "National Historic Landmark district — cobblestone streets, cigar factory architecture, and free-roaming chickens.",
+  },
+  {
+    id: "seed-392",
+    name: "Henry B. Plant Museum",
+    type: "historic",
+    address: "401 W Kennedy Blvd, Tampa, FL 33606",
+    hours: "Mon closed; Tue–Sat 10 AM–5 PM; Sun 12–5 PM",
+    activities: [],
+    rating: 4.6,
+    infoNote: "The former Tampa Bay Hotel — a National Historic Landmark with silver minarets visible from across the river.",
+  },
+  {
+    id: "seed-393",
+    name: "City of Clearwater Centennial Monument",
+    type: "historic",
+    address: "3368 Gulf To Bay Blvd, Clearwater, FL 33759",
+    hours: "Open 24 hours",
+    activities: [],
+    rating: 5.0,
+    infoNote: "Waterfront monument marking Clearwater's founding — a good spot for sunsets or fireworks.",
+  },
+  {
+    id: "seed-394",
+    name: "Sacred Lands Preservation & Education",
+    type: "historic",
+    address: "1700 Park St N #4348, St. Petersburg, FL 33710",
+    hours: "By tour/event — check ahead",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Historic Native American mound site with lush grounds; peacocks roam freely.",
+  },
+  {
+    id: "seed-395",
+    name: "Heritage Village",
+    type: "historic",
+    address: "11909 125th St, Largo, FL 33774",
+    hours: "Mon–Tue closed; Wed–Sat 10 AM–4 PM; Sun 1–4 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Free open-air museum of 30+ relocated historic buildings; docent tours of the Seven Gables House are worthwhile.",
+  },
+  {
+    id: "seed-396",
+    name: "Clearwater Historical Society Museum and Cultural Center",
+    type: "historic",
+    address: "610 S Ft Harrison Ave, Clearwater, FL 33756",
+    hours: "Mon–Tue/Sun closed; Wed–Sat 10 AM–2 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Housed in Clearwater's oldest school building, with exhibits on the city's history.",
+  },
+  {
+    id: "seed-397",
+    name: "Rapp Brewing Company",
+    type: "brewery",
+    address: "10930 Endeavour Way C, Seminole, FL 33777",
+    hours: "Mon 3–9 PM; Tue–Thu 3–10 PM; Fri 2–11 PM; Sat 2–10 PM; Sun 1–8 PM",
+    activities: [],
+    rating: 4.9,
+    infoNote: "Known for exceptional sours and Berliner Weisse styles; food trucks rotate on site.",
+  },
+  {
+    id: "seed-398",
+    name: "Pee-Pa's Garage Craft Brewery",
+    type: "brewery",
+    address: "6340 49th Street N, Pinellas Park, FL 33781",
+    hours: "Mon–Tue closed; Wed–Thu 3–10 PM; Fri–Sat 12–11 PM; Sun 12–8 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Former auto collision shop with axe throwing, lawn games, and a working classic-car garage on site.",
+  },
+  {
+    id: "seed-399",
+    name: "Anecdote Brewing Company",
+    type: "brewery",
+    address: "321 Gulf Blvd, Indian Rocks Beach, FL 33785",
+    hours: "Mon–Thu 1–10 PM; Fri–Sun 12–10 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "One block from the beach — cans are beach-friendly with resealable tops.",
+  },
+  {
+    id: "seed-400",
+    name: "Arkane Aleworks",
+    type: "brewery",
+    address: "2480 E Bay Dr #23, Largo, FL 33771",
+    hours: "Mon–Tue closed; Wed–Fri 3–10 PM; Sat–Sun 1–10 PM",
+    activities: [],
+    rating: 4.9,
+    infoNote: "Known for thick sours and hoppy IPAs; dog-friendly beer garden out back.",
+  },
+  {
+    id: "seed-401",
+    name: "Leaven Brewing",
+    type: "brewery",
+    address: "11238 Boyette Rd, Riverview, FL 33569",
+    hours: "Mon–Thu 12–10 PM; Fri–Sat 12 PM–12 AM; Sun 12–10 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Sandwiches and board games alongside a well-loved beer lineup.",
+  },
+  {
+    id: "seed-402",
+    name: "Bullfrog Creek Brewing Co.",
+    type: "brewery",
+    address: "3632 Lithia Pinecrest Rd, Valrico, FL 33596",
+    hours: "Mon–Thu 11:30 AM–10 PM; Fri–Sat 11:30 AM–11 PM; Sun 11:30 AM–8 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Family-friendly brewpub with an indoor/outdoor patio, dog-friendly outside.",
+  },
+  {
+    id: "seed-403",
+    name: "Magnanimous Brewing Seminole Heights",
+    type: "brewery",
+    address: "6809 N Nebraska Ave, Tampa, FL 33604",
+    hours: "Mon 4–10 PM; Tue–Wed 2:30–10 PM; Thu 4–10 PM; Fri–Sat 12–11 PM; Sun 12–9 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Second Magnanimous location — dog-friendly, metal-themed, with pinball and a food truck out front.",
+  },
+  {
+    id: "seed-404",
+    name: "Crooked Thumb Brewery",
+    type: "brewery",
+    address: "555 10th Ave S, Safety Harbor, FL 34695",
+    hours: "Mon–Thu 4–10 PM; Fri 2 PM–12 AM; Sat 12 PM–12 AM; Sun 12–9 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Big outdoor yard with a stage for live bands; residential-area location with limited street parking.",
+  },
+  {
+    id: "seed-405",
+    name: "Troubled Waters Brewing",
+    type: "brewery",
+    address: "670 Main St, Safety Harbor, FL 34695",
+    hours: "Mon–Tue 4–9 PM; Wed–Thu 3–10 PM; Fri 2 PM–12 AM; Sat 12 PM–12 AM; Sun 12–8 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Wine and seltzer options too, with a view of the brewing kettles from the bar.",
+  },
+  {
+    id: "seed-406",
+    name: "Ozona Brewing Company",
+    type: "brewery",
+    address: "315 Orange St, Palm Harbor, FL 34683",
+    hours: "Mon closed; Tue–Thu 3–11 PM; Fri 3 PM–1 AM; Sat 12 PM–1 AM; Sun 12–10 PM",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Quirky dive-bar vibe with a chalkboard ceiling and live music; very dog-friendly.",
+  },
+  {
+    id: "seed-407",
+    name: "Stilt House Brewery",
+    type: "brewery",
+    address: "625 US-19 ALT, Palm Harbor, FL 34683",
+    hours: "Mon–Thu 2–11 PM; Fri–Sat 12 PM–12 AM; Sun 12–11 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Neighborhood gathering spot with cocktails for non-beer drinkers too; live music Saturdays.",
+  },
+  {
+    id: "seed-408",
+    name: "Tampa Bay Brewing Company",
+    type: "brewery",
+    address: "13937 Monroes Business Park, Tampa, FL 33635",
+    hours: "Daily, 11 AM–10/11 PM",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Large brewpub near the airport area with a full food menu and dog-friendly patio.",
+  },
+  {
+    id: "seed-409",
+    name: "Fresh Harvest Farmers Market",
+    type: "farmers_market",
+    address: "11000 110th Ave N, Largo, FL 33778",
+    hours: "Sat, 9 AM–2 PM",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Weekly Saturday market with produce and local vendors.",
+  },
+  {
+    id: "seed-410",
+    name: "The Downtown Palm Harbor Community Market",
+    type: "farmers_market",
+    address: "797 Florida Ave, Palm Harbor, FL 34683",
+    hours: "Sat, 10 AM–3 PM",
+    activities: [],
+    rating: 3.7,
+    infoNote: "Family-friendly market with food trucks and a kids' bingo card; location can shift, check ahead.",
+  },
+  {
+    id: "seed-411",
+    name: "Steve's Produce",
+    type: "farmers_market",
+    address: "515 Alt 19, Palm Harbor, FL 34683",
+    hours: "Mon–Sat 7:30 AM–6:30 PM; Sun 7:30 AM–5:30 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Third-generation family-owned produce market with meats, cheeses, and local honey.",
+  },
+  {
+    id: "seed-412",
+    name: "Wolfe's Produce",
+    type: "farmers_market",
+    address: "6005 FL-43, Riverview, FL 33578",
+    hours: "Daily, 9 AM–7 PM",
+    activities: [],
+    rating: 4.4,
+    infoNote: "Local twin-owned produce stand known for low prices and friendly service.",
+  },
+  {
+    id: "seed-413",
+    name: "Plant City Farm & Flea Market",
+    type: "farmers_market",
+    address: "708 W Sam Allen Rd, Plant City, FL 33565",
+    hours: "Mon–Fri 6:30 AM–1 PM; Sat–Sun 6:30 AM–6 PM",
+    activities: [],
+    rating: 4.4,
+    infoNote: "Large produce and flea market — bring cash, most vendors don't take cards.",
+  },
+  {
+    id: "seed-414",
+    name: "Gina's Fresh Produce",
+    type: "farmers_market",
+    address: "214 S Valrico Rd, Valrico, FL 33594",
+    hours: "Mon closed; Tue–Sun 10 AM–6 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Small family-run produce stand, known for exotic fruit and honest, personal service.",
+  },
+  {
+    id: "seed-415",
+    name: "Bob's Berries",
+    type: "farmers_market",
+    address: "11501 Winn Rd, Riverview, FL 33569",
+    hours: "Sat–Sun, 9:30 AM–3 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "U-pick blueberries and other berries, plus a nursery of fruit trees and shrubs.",
+  },
+  {
+    id: "seed-416",
+    name: "Plant City Farmers Market Produce",
+    type: "farmers_market",
+    address: "1305 W Dr Martin Luther King Jr Blvd, Plant City, FL 33563",
+    hours: "Sat, 7 AM–2 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Small Saturday market known for its on-site restaurant as much as the produce.",
+  },
+  {
+    id: "seed-417",
+    name: "Addicted to The Bean",
+    type: "coffee",
+    address: "3690 E Bay Dr Ste Y, Largo, FL 33771",
+    hours: "Daily, 7 AM–3 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Sandwiches and pastries alongside coffee-snob-approved espresso drinks.",
+  },
+  {
+    id: "seed-418",
+    name: "Swell Coffee",
+    type: "coffee",
+    address: "11148 Starkey Rd, Largo, FL 33773",
+    hours: "Daily, 7 AM–4 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Kid-friendly play area, full seasonal drink menu, easy strip-mall parking.",
+  },
+  {
+    id: "seed-419",
+    name: "D.O.D. Coffee Roastery",
+    type: "coffee",
+    address: "12543 Ulmerton Rd, Largo, FL 33774",
+    hours: "Mon–Sat 8 AM–3 PM; Sun 8 AM–1 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Roasts and brews in-house; large breakfast menu alongside specialty coffee.",
+  },
+  {
+    id: "seed-420",
+    name: "Driftwood Kava & Roastery",
+    type: "coffee",
+    address: "10767 Park Blvd, Seminole, FL 33772",
+    hours: "Daily, 7 AM–12 AM",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Coffee, kava, and kombucha on tap; cozy art-filled interior.",
+  },
+  {
+    id: "seed-421",
+    name: "Cool Beans Coffee and Ice Cream",
+    type: "coffee",
+    address: "811 Co Rd 1, Palm Harbor, FL 34683",
+    hours: "Mon–Thu 7 AM–8 PM; Fri 7 AM–9 PM; Sat 7:30 AM–9 PM; Sun 7:30 AM–7 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Coffee and ice cream combo with board games and a kids' coloring corner.",
+  },
+  {
+    id: "seed-422",
+    name: "Sunshine Joe's Coffee Shop",
+    type: "coffee",
+    address: "13128 Indian Rocks Rd, Largo, FL 33774",
+    hours: "Mon–Fri 7:30 AM–4 PM; Sat 8 AM–4 PM; Sun 8 AM–3 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Homey, eccentric decor; supports other women-owned local businesses via in-shop products.",
+  },
+  {
+    id: "seed-423",
+    name: "Coastal Souls Coffeehouse",
+    type: "coffee",
+    address: "17465 Gulf Blvd, Redington Shores, FL 33708",
+    hours: "Daily, 7 AM–2 PM",
+    activities: [],
+    rating: 4.9,
+    infoNote: "Waterfront back patio seating — eagle and dolphin sightings are common.",
+  },
+  {
+    id: "seed-424",
+    name: "Sugar Baby Cafe",
+    type: "coffee",
+    address: "9191 Park Blvd, Seminole, FL 33777",
+    hours: "Daily, 8 AM–3 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "European-style cafe with a flower stand inside; expect a wait on weekends.",
+  },
+  {
+    id: "seed-425",
+    name: "Moon Mountain",
+    type: "coffee",
+    address: "210 S Kings Ave # J, Brandon, FL 33511",
+    hours: "Mon–Thu 9 AM–11 PM; Fri–Sat 9 AM–12 AM; Sun 10 AM–10 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Kava and kratom bar alongside coffee and smoothies; colorful specialty drinks.",
+  },
+  {
+    id: "seed-426",
+    name: "Foxtail Coffee Co. — Riverview",
+    type: "coffee",
+    address: "3938 US-301, Riverview, FL 33578",
+    hours: "Daily, 6 AM–8 PM",
+    activities: [],
+    rating: 4.6,
+    infoNote: "Florida-based small-batch roaster; reliably good espresso drinks.",
+  },
+  {
+    id: "seed-427",
+    name: "Chill Cawfee",
+    type: "coffee",
+    address: "16741 Fishhawk Blvd, Lithia, FL 33547",
+    hours: "Mon–Thu 6:30 AM–10 PM; Fri–Sat 6:30 AM–11 PM; Sun 7:30 AM–10 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Game room with pinball machines attached; relaxed, hippie-cafe vibe.",
+  },
+  {
+    id: "seed-428",
+    name: "Just Love Coffee Cafe",
+    type: "coffee",
+    address: "2020 W Brandon Blvd Ste 105, Brandon, FL 33511",
+    hours: "Daily, 7 AM–4 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Waffle cinnamon rolls are a signature item; boardwalk seating out back.",
+  },
+  {
+    id: "seed-429",
+    name: "Blind Tiger Coffee Roasters",
+    type: "coffee",
+    address: "885 Brandon Town Center Dr, Brandon, FL 33511",
+    hours: "Mon–Thu 10 AM–8 PM; Fri–Sat 10 AM–9 PM; Sun 11 AM–6 PM",
+    activities: [],
+    rating: 4.4,
+    infoNote: "Located inside Westfield Brandon mall, a convenient coffee break while shopping.",
+  },
+  {
+    id: "seed-430",
+    name: "Cali Cafe",
+    type: "coffee",
+    address: "10010 US-301, Riverview, FL 33578",
+    hours: "Mon–Thu 6 AM–4 PM; Fri 6 AM–5 PM; Sat 6:30 AM–6 PM; Sun 7 AM–5 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Colombian-style coffee and breakfast; arepas and cinnamon rolls are standouts.",
+  },
+  {
+    id: "seed-431",
+    name: "Quig's Kava Lounge",
+    type: "coffee",
+    address: "16741 Fishhawk Blvd, Lithia, FL 33547",
+    hours: "Mon–Thu 6:30 AM–10 PM; Fri–Sat 6:30 AM–11 PM; Sun 7:30 AM–10 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Kava, kombucha, and delta-8 coffee alongside board and card games.",
+  },
+  {
+    id: "seed-432",
+    name: "Leepa-Rattner Museum of Art",
+    type: "museum",
+    address: "600 E Klosterman Rd, Tarpon Springs, FL 34689",
+    hours: "Mon closed; Tue–Sat 11 AM–5 PM; Sun closed",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Free art museum on the St. Petersburg College campus, known for a rotating miniature art exhibit.",
+  },
+  {
+    id: "seed-433",
+    name: "Tarpon Springs Heritage Museum",
+    type: "museum",
+    address: "100 Beekman Ln, Tarpon Springs, FL 34689",
+    hours: "Mon–Fri 10 AM–4 PM; Sat–Sun closed",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Focuses on Greek heritage, the sponge industry, and local Epiphany traditions.",
+  },
+  {
+    id: "seed-434",
+    name: "Replay Museum",
+    type: "museum",
+    address: "119 E Tarpon Ave, Tarpon Springs, FL 34689",
+    hours: "Mon–Tue closed; Wed–Thu 11 AM–7 PM; Fri–Sat 11 AM–11 PM; Sun 11 AM–7 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Play-all-you-want vintage arcade and pinball museum; flat entry fee with in/out privileges.",
+  },
+  {
+    id: "seed-435",
+    name: "Tarpon Springs Aquarium and Animal Sanctuary",
+    type: "museum",
+    address: "1722 N Pinellas Ave, Tarpon Springs, FL 34689",
+    hours: "Daily, 10 AM–5 PM",
+    activities: [],
+    rating: 4.6,
+    infoNote: "Hands-on encounters with stingrays, sharks, and reptiles; extra fee to feed the animals.",
+  },
+  {
+    id: "seed-436",
+    name: "Tarpon Springs Historical Train Depot Museum",
+    type: "museum",
+    address: "160 E Tarpon Ave, Tarpon Springs, FL 34689",
+    hours: "Mon–Tue closed; Wed–Fri 11 AM–3 PM; Sat–Sun closed",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Housed in a former rail depot along the Pinellas Trail, covering local agriculture and sponge trade history.",
+  },
+  {
+    id: "seed-437",
+    name: "Robert W. Willaford Railroad Museum",
+    type: "museum",
+    address: "102 N Palmer St, Plant City, FL 33563",
+    hours: "Mon closed; Tue–Fri 11 AM–4 PM; Sat 10 AM–4 PM; Sun closed",
+    activities: [],
+    rating: 4.6,
+    infoNote: "Free museum with a walk-through caboose; you can sometimes watch trains pass live.",
+  },
+  {
+    id: "seed-438",
+    name: "Showmen's Museum",
+    type: "museum",
+    address: "6938 Riverview Dr, Riverview, FL 33578",
+    hours: "Mon–Wed closed; Thu–Sun 12–5 PM",
+    activities: [],
+    rating: 4.8,
+    infoNote: "Niche museum on American carnival and sideshow history in Gibsonton; $20 entry.",
+  },
+  {
+    id: "seed-439",
+    name: "Dinosaur World",
+    type: "museum",
+    address: "5145 Harvey Tew Rd, Plant City, FL 33565",
+    hours: "Daily, 10 AM–5 PM",
+    activities: [],
+    rating: 4.5,
+    infoNote: "Outdoor walking park with 200+ life-size dinosaur statues, fossil dig, and mini-golf.",
+  },
+  {
+    id: "seed-440",
+    name: "Tarpon Springs Sponge Docks",
+    type: "historic",
+    address: "735 Dodecanese Blvd, Tarpon Springs, FL 34689",
+    hours: "Daily, 10 AM–10 PM",
+    activities: [],
+    rating: 4.7,
+    infoNote: "Historic Greek sponge-diving waterfront — boat tours, bakeries, and authentic Greek restaurants.",
+  },
+  {
+    id: "seed-441",
+    name: "Safford House Museum",
+    type: "historic",
+    address: "23 Parkin Ct, Tarpon Springs, FL 34689",
+    hours: "Mon–Tue closed; Wed–Fri 11 AM–3 PM; Sat–Sun closed",
+    activities: [],
+    rating: 4.7,
+    infoNote: "1883 mansion with original wood floors and period furnishings; parking is limited.",
+  },
+  {
+    id: "seed-442",
+    name: "Anclote Key Lighthouse",
+    type: "historic",
+    address: "Anclote Key, FL",
+    hours: "Rarely open to the public — check ahead",
+    activities: [],
+    rating: 4.8,
+    infoNote: "1887 lighthouse on a barrier island, boat-access only. A rare open house lets visitors climb it for a small fee.",
+  },
+  {
     id: "seed-5",
     name: "New Tampa Nature Park",
     type: "nature",
@@ -4255,7 +5478,7 @@ function AddParkForm({ onAdd, onCancel }) {
     <div className="add-form-backdrop" onClick={onCancel}>
       <div className="add-form" onClick={(e) => e.stopPropagation()}>
         <div className="add-form-header">
-          <h3>Add a Park</h3>
+          <h3>Add a Place</h3>
           <button className="icon-btn" onClick={onCancel} aria-label="Close">
             <X size={18} />
           </button>
@@ -4348,7 +5571,7 @@ function AddParkForm({ onAdd, onCancel }) {
         />
 
         <button className="primary-btn" onClick={submit}>
-          <Plus size={16} /> Add Park
+          <Plus size={16} /> Add Place
         </button>
       </div>
     </div>
@@ -4618,7 +5841,7 @@ function ParkMap({
     return (
       <div className="map-empty-state">
         <MapIcon size={30} />
-        <p>No parks with coordinates match your filters yet.</p>
+        <p>No places with coordinates match your filters yet.</p>
       </div>
     );
   }
@@ -4833,7 +6056,7 @@ export default function ParkExplorer() {
       );
       if (missing.length === 0) {
         if (!silent) {
-          setSyncMessage("You're all caught up — no new parks to add.");
+          setSyncMessage("You're all caught up — nothing new to add.");
           setTimeout(() => setSyncMessage(null), 3500);
         }
         return prevParks;
@@ -4848,7 +6071,7 @@ export default function ParkExplorer() {
         return nextVisits;
       });
       setSyncMessage(
-        `Added ${missing.length} new park${missing.length === 1 ? "" : "s"}: ${missing
+        `Added ${missing.length} new place${missing.length === 1 ? "" : "s"}: ${missing
           .map((p) => p.name)
           .join(", ")}`
       );
@@ -5007,7 +6230,7 @@ export default function ParkExplorer() {
         <div className="stats-row">
           <div className="stat">
             <strong>{stats.total}</strong>
-            <span>Parks</span>
+            <span>Places</span>
           </div>
           <div className="stat-divider" aria-hidden="true" />
           <div className="stat">
@@ -5048,10 +6271,29 @@ export default function ParkExplorer() {
           <Search size={16} />
           <input
             className="search-input"
-            placeholder="Search parks or areas..."
+            placeholder="Search places or areas..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+        </div>
+
+        <div className="type-tabs type-tabs-primary">
+          <button
+            className={`type-tab ${typeFilter === "all" ? "type-tab-active" : ""}`}
+            onClick={() => setTypeFilter("all")}
+          >
+            All
+          </button>
+          {Object.entries(TYPE_META).map(([key, meta]) => (
+            <button
+              key={key}
+              className={`type-tab ${typeFilter === key ? "type-tab-active" : ""}`}
+              onClick={() => setTypeFilter(key)}
+              style={typeFilter === key ? { borderColor: meta.color, color: meta.color } : {}}
+            >
+              {meta.label}
+            </button>
+          ))}
         </div>
 
         <div className="filters-toggle-row">
@@ -5066,18 +6308,18 @@ export default function ParkExplorer() {
           </button>
           <div className="toggle-row-btns">
             <button className="secondary-btn small" onClick={() => syncNewSeedParks()}>
-              <RefreshCw size={14} /> Sync new parks
+              <RefreshCw size={14} /> Sync
             </button>
             <button className="primary-btn small" onClick={() => setShowAddForm(true)}>
-              <Plus size={15} /> Add Park
+              <Plus size={15} /> Add Place
             </button>
           </div>
         </div>
 
         <p className="result-count">
           {filteredParks.length === parks.length
-            ? `${parks.length} parks`
-            : `${filteredParks.length} of ${parks.length} parks shown`}
+            ? `${parks.length} places`
+            : `${filteredParks.length} of ${parks.length} places shown`}
         </p>
 
         {showFilters && (
@@ -5104,25 +6346,6 @@ export default function ParkExplorer() {
                   Top Rated
                 </button>
               </div>
-            </div>
-
-            <div className="type-tabs">
-              <button
-                className={`type-tab ${typeFilter === "all" ? "type-tab-active" : ""}`}
-                onClick={() => setTypeFilter("all")}
-              >
-                All
-              </button>
-              {Object.entries(TYPE_META).map(([key, meta]) => (
-                <button
-                  key={key}
-                  className={`type-tab ${typeFilter === key ? "type-tab-active" : ""}`}
-                  onClick={() => setTypeFilter(key)}
-                  style={typeFilter === key ? { borderColor: meta.color, color: meta.color } : {}}
-                >
-                  {meta.label}
-                </button>
-              ))}
             </div>
 
             <div className="chip-row">
@@ -5202,7 +6425,7 @@ export default function ParkExplorer() {
           {visitHistory.length === 0 && (
             <div className="empty-state">
               <HistoryIcon size={30} />
-              <p>No visits logged yet. Mark a park as visited and it'll show up here.</p>
+              <p>No visits logged yet. Mark a place as visited and it'll show up here.</p>
             </div>
           )}
           {visitHistory.map((group) => (
@@ -5239,7 +6462,7 @@ export default function ParkExplorer() {
           {filteredParks.length === 0 && (
             <div className="empty-state">
               <TreePine size={30} />
-              <p>No parks match those filters yet. Try widening your search, or add one.</p>
+              <p>No places match those filters yet. Try widening your search, or add one.</p>
             </div>
           )}
           {filteredParks.map((park) => (
@@ -5411,6 +6634,12 @@ function StyleBlock() {
       .type-tabs {
         display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
       }
+      .type-tabs-primary {
+        flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px;
+        -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      }
+      .type-tabs-primary::-webkit-scrollbar { display: none; }
+      .type-tabs-primary .type-tab { flex-shrink: 0; }
       .type-tab {
         font-family: 'Public Sans', sans-serif;
         font-size: 12.5px; font-weight: 600;
